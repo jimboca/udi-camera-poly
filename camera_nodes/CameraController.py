@@ -254,12 +254,14 @@ class CameraController(polyinterface.Controller):
             val = 0
         self.short_poll = int(val)
         self.setDriver('GV6', self.short_poll)
+        self.polyConfig['shortPoll'] = val
 
     def set_long_poll(self,val):
         if val is None:
             val = 0
         self.long_poll = int(val)
         self.setDriver('GV7', self.long_poll)
+        self.polyConfig['longPoll'] = val
         
     def cmd_install_profile(self,command):
         self.l_info("_cmd_install_profile","installing...")
@@ -277,6 +279,21 @@ class CameraController(polyinterface.Controller):
         self.l_info("cmd_set_foscam_mjpeg",val)
         self.set_foscam_mjpeg(val)
     
+    def cmd_set_debug_mode(self,command):
+        val = command.get('value')
+        self.l_info("cmd_set_debug_mode",val)
+        self.set_debug_mode(val)
+    
+    def cmd_set_short_poll(self,command):
+        val = command.get('value')
+        self.l_info("cmd_set_short_poll",val)
+        self.set_short_poll(val)
+
+    def cmd_set_long_poll(self,command):
+        val = int(command.get('value'))
+        self.l_info("cmd_set_long_poll",val)
+        self.set_long_poll(val)
+
     """
     Optional.
     Since the controller is the parent node in ISY, it will actual show up as a node.
@@ -290,17 +307,17 @@ class CameraController(polyinterface.Controller):
         'QUERY': query,
         'DISCOVER': discover,
         'INSTALL_PROFILE': cmd_install_profile,
-        'SET_FOSCAM_MJPEG': cmd_set_foscam_mjpeg,
-        #'SET_DM': _set_debug_mode,
-        #'SET_SHORTPOLL': _cmd_set_shortpoll,
-        #'SET_LONGPOLL':  _cmd_set_longpoll
+        'SET_FOSCAM_POLLING': cmd_set_foscam_polling,
+        'SET_DM': cmd_set_debug_mode,
+        'SET_SHORTPOLL': cmd_set_short_poll,
+        'SET_LONGPOLL':  cmd_set_long_poll
     }
     drivers = [
         {'driver': 'ST',  'value': 0, 'uom': 2},
         {'driver': 'GV1', 'value': 0, 'uom': 56}, # Major version of this code.
         {'driver': 'GV2', 'value': 0, 'uom': 56}, # Minor version of this code.
         {'driver': 'GV3', 'value': 0, 'uom': 56}, # Number of cameras we manage
-        {'driver': 'GV4', 'value': 0, 'uom': 25}, # Foscam Polling
+        {'driver': 'GV4', 'value': 1, 'uom': 25}, # Foscam Polling
         {'driver': 'GV5', 'value': 0, 'uom': 25}, # Debug (Log) Mode
         {'driver': 'GV6', 'value': 5, 'uom': 25}, # shortpoll
         {'driver': 'GV7', 'value': 60, 'uom': 25}  # longpoll
