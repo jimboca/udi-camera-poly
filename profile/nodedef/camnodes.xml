@@ -5,10 +5,15 @@
   <nodeDef id="CameraController" nodeType="139" nls="CAMC">
     <sts>
       <st id="ST" editor="BOOL" />
+      <!-- Version Major -->
       <st id="GV1" editor="FLOAT" />
+      <!-- Version Minor -->
       <st id="GV2" editor="FLOAT" />
+      <!-- Cameras -->
       <st id="GV3" editor="I_INTEGER" />
+      <!-- Foscam Polling -->
       <st id="GV4" editor="I_FOSCAM_MJPEG" />
+      <!-- Debug (Log) Mode -->
       <st id="GV5" editor="I_DM" />
       <!-- shortpoll -->
       <st id="GV6" editor="I_INTEGER" />
@@ -16,19 +21,17 @@
       <st id="GV7" editor="I_INTEGER" />
     </sts>
     <cmds>
-      <sends>
-	<cmd id="DON" />
-      </sends>
       <accepts>
 	<cmd id="QUERY" />
 	<cmd id="DISCOVER" />
+        <cmd id="INSTALL_PROFILE" />
 	<!--  Foscam MJPEG Polling -->
-        <cmd id="SET_FOSCAM_MJPEG">
-          <p id="" editor="I_FOSCAM_MJPEG" init="GV3" />
+        <cmd id="SET_FOSCAM_POLLING">
+          <p id="" editor="I_FOSCAM_POLLING" init="GV4" />
         </cmd>
 	<!--  Log Debug Mode -->
         <cmd id="SET_DM">
-          <p id="" editor="I_DM" init="GV4"/>
+          <p id="" editor="I_DM" init="GV5"/>
         </cmd>
         <cmd id="SET_SHORTPOLL">
           <p id="" editor="I_INTEGER" init="GV6"/>

@@ -82,8 +82,8 @@
     </editor>
 
     <!-- 0-4 Foscam polling mode -->
-    <editor id="I_FOSCAM_MJPEG">
-        <range uom="25" subset="0-4" nls="CFMJPEG" />
+    <editor id="I_FOSCAM_POLLING">
+        <range uom="25" subset="0-4" nls="CFPL" />
     </editor>
 
     <!-- 0-4 Log Debug Mode -->

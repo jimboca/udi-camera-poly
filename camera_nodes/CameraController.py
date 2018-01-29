@@ -261,8 +261,12 @@ class CameraController(polyinterface.Controller):
         self.long_poll = int(val)
         self.setDriver('GV7', self.long_poll)
         
+    def cmd_install_profile(self,command):
+        self.l_info("_cmd_install_profile","installing...")
+        self.poly.installprofile()
+
     def cmd_set_foscam_mjpeg(self,command):
-        """ Enable/Disable Foscam MJPEG UDP Searching
+        """ Enable/Disable Foscam UDP Searching
               0 = Off
               1 = 10 second query
               2 = 20 second query
@@ -270,7 +274,7 @@ class CameraController(polyinterface.Controller):
               4 = 60 second query
         """
         val = int(command.get('value'))
-        self.l_info("_cmd_set_foscam_mjpeg",val)
+        self.l_info("cmd_set_foscam_mjpeg",val)
         self.set_foscam_mjpeg(val)
     
     """
@@ -285,6 +289,7 @@ class CameraController(polyinterface.Controller):
     commands = {
         'QUERY': query,
         'DISCOVER': discover,
+        'INSTALL_PROFILE': cmd_install_profile,
         'SET_FOSCAM_MJPEG': cmd_set_foscam_mjpeg,
         #'SET_DM': _set_debug_mode,
         #'SET_SHORTPOLL': _cmd_set_shortpoll,

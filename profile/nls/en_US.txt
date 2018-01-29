@@ -4,19 +4,22 @@ ND-CameraController-NAME = Camera Server 0.8.0
 ND-CameraController-ICON = Input
 ST-CAMC-ST-NAME = Polyglot Status
 ST-CAMC-GV1-NAME = Camera NodeServer Version Major
-ST-CAMC-GV5-NAME = Camera NodeServer Version Minor
-ST-CAMC-GV2-NAME = Cameras
-ST-CAMC-GV3-NAME = Foscam MJPEG Search
-ST-CAMC-GV4-NAME = Debug Mode
+ST-CAMC-GV2-NAME = Camera NodeServer Version Minor
+ST-CAMC-GV3-NAME = Cameras
+ST-CAMC-GV4-NAME = Foscam MJPEG Search
+ST-CAMC-GV5-NAME = Debug Mode
 ST-CAMC-GV6-NAME = Short Poll
 ST-CAMC-GV7-NAME = Long Poll
 
+CMD-CAMC-DISCOVER-NAME = Discover
+CMD-CAMC-INSTALL_PROFILE-NAME = Install Profile
+
 CMD-SET_FOSCAM_MJPEG-NAME = Foscam MJPEG Search
-CFMJPEG-0 = Off
-CFMJPEG-1 = 10s Query
-CFMJPEG-2 = 20s Query
-CFMJPEG-3 = 30s Query
-CFMJPEG-4 = 60s Query
+CFPL-0 = Off
+CFPL-1 = 10s Query
+CFPL-2 = 20s Query
+CFPL-3 = 30s Query
+CFPL-4 = 60s Query
 
 CMD-SET_DM-NAME = Debug
 CDM-0 = All
@@ -28,8 +31,6 @@ CDM-50 = Critical
 
 CMD-SET_SHORTPOLL-NAME = Short Poll
 CMD-SET_LONGPOLL-NAME = Long Poll
-
-CMD-DISCOVER-NAME = Discover
 
 # Camera Names
 ND-GCAM-NAME = Generic IP Camera
