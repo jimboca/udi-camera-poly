@@ -1,6 +1,6 @@
 
 # Camera Server
-ND-CameraController-NAME = Camera Server 0.8.0
+ND-CameraController-NAME = Camera Server 0.0.0
 ND-CameraController-ICON = Input
 ST-CAMC-ST-NAME = Polyglot Status
 ST-CAMC-GV1-NAME = Camera NodeServer Version Major
