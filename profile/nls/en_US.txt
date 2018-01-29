@@ -14,14 +14,14 @@ ST-CAMC-GV7-NAME = Long Poll
 CMD-CAMC-DISCOVER-NAME = Discover
 CMD-CAMC-INSTALL_PROFILE-NAME = Install Profile
 
-CMD-SET_FOSCAM_MJPEG-NAME = Foscam MJPEG Search
+CMD-CAMC-SET_FOSCAM_POLLING-NAME = Foscam MJPEG Search
 CFPL-0 = Off
 CFPL-1 = 10s Query
 CFPL-2 = 20s Query
 CFPL-3 = 30s Query
 CFPL-4 = 60s Query
 
-CMD-SET_DM-NAME = Debug
+CMD-CAMC-SET_DM-NAME = Debug
 CDM-0 = All
 CDM-10 = Debug
 CDM-20 = Info
@@ -29,8 +29,8 @@ CDM-30 = Warning
 CDM-40 = Error
 CDM-50 = Critical
 
-CMD-SET_SHORTPOLL-NAME = Short Poll
-CMD-SET_LONGPOLL-NAME = Long Poll
+CMD-CAMC-SET_SHORTPOLL-NAME = Short Poll
+CMD-CAMC-SET_LONGPOLL-NAME = Long Poll
 
 # Camera Names
 ND-GCAM-NAME = Generic IP Camera
