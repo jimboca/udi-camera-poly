@@ -1,0 +1,263 @@
+
+# Camera Server
+ND-CameraController-NAME = Camera Server 0.8.0
+ND-CameraController-ICON = Input
+ST-CAMC-ST-NAME = Polyglot Status
+ST-CAMC-GV1-NAME = Camera NodeServer Version Major
+ST-CAMC-GV5-NAME = Camera NodeServer Version Minor
+ST-CAMC-GV2-NAME = Cameras
+ST-CAMC-GV3-NAME = Foscam MJPEG Search
+ST-CAMC-GV4-NAME = Debug Mode
+ST-CAMC-GV6-NAME = Short Poll
+ST-CAMC-GV7-NAME = Long Poll
+
+CMD-SET_FOSCAM_MJPEG-NAME = Foscam MJPEG Search
+CFMJPEG-0 = Off
+CFMJPEG-1 = 10s Query
+CFMJPEG-2 = 20s Query
+CFMJPEG-3 = 30s Query
+CFMJPEG-4 = 60s Query
+
+CMD-SET_DM-NAME = Debug
+CDM-0 = All
+CDM-10 = Debug
+CDM-20 = Info
+CDM-30 = Warning
+CDM-40 = Error
+CDM-50 = Critical
+
+CMD-SET_SHORTPOLL-NAME = Short Poll
+CMD-SET_LONGPOLL-NAME = Long Poll
+
+CMD-DISCOVER-NAME = Discover
+
+# Camera Names
+ND-GCAM-NAME = Generic IP Camera
+
+ND-FoscamMJPEG-NAME = Foscam MJPEG Camera
+ND-FoscamMJPEG-ICON = Input
+ND-FCAM1-ICON = Input
+
+ND-FoscamHD2-NAME = Foscam HD2 Camera
+ND-FoscamHD2-ICON = Input
+ND-FCAM1-ICON = Input
+
+# Camera Controls
+ST-CAM-GV1-NAME = Polyglot Node Version Major
+ST-CAM-GV2-NAME = IP Address
+ST-CAM-GV3-NAME = Port
+ST-CAM-GV4-NAME = Responding
+ST-CAM-GV5-NAME = Network LED Mode
+ST-CAM-GV6-NAME = Alarm Motion Armed
+ST-CAM-GV7-NAME = Alarm Send Mail
+ST-CAM-GV8-NAME = Motion Sensitivity
+ST-CAM-GV9-NAME = Motion Compensation
+ST-CAM-GV10-NAME = Authorization Mode
+ST-CAM-GV11-NAME = Camera System Version
+ST-CAM-GV12-NAME = Polyglot Node Version Minor
+ST-CAM-GV13-NAME = Upload Interval
+
+CMD-ST-NAME = Query
+CMD-CAM-REBOOT-NAME = Reboot
+CMD-CAM-SET_LEDM-NAME = Set Network LED Mode
+CMD-CAM-SET_IRLED-NAME = Set IR LED
+CMD-CAM-SET_ALMOA-NAME = Set Alarm Motion Armed
+CMD-CAM-SET_ALML-NAME = Set Alarm Send Mail
+CMD-CAM-SET_ALMOS-NAME = Set Alarm Motion Sensitivity
+CMD-CAM-SET_ALMOC-NAME = Set Alarm Motion Compensation
+CMD-CAM-SET_POS-NAME = Set Position
+CMD-CAM-SET_AUTHM-NAME = Set Authorization Mode
+CMD-CAM-SET_UPINT-NAME = Set Upload Interval
+
+#CMDP-CAM-BOOL-GV6-NAME = Armed
+#CMDP-CAM-BOOL-GV7-NAME = Send Email
+#CMDP-CAM-I_POS16-POS-NAME = Preset
+#CMDP-CAM-I_MOO-GV10-NAME = Value
+#CMDP-CAM-I_M01O-GV5-NAME = Mode
+#CMDP-CAM-I_ALMOS-GV8-NAME = Sensitivity
+#CMDP-CAM-BOOL-GV9-NAME = Compensation
+#CMDP-CAM-
+
+# Camera Controls
+ST-FOSHD2-GV1-NAME = Polyglot Node Version Major
+ST-FOSHD2-GV2-NAME = IP Address
+ST-FOSHD2-GV3-NAME = Port
+ST-FOSHD2-GV4-NAME = Responding
+ST-FOSHD2-GV5-NAME = IR LED Mode
+ST-FOSHD2-GV6-NAME = Motion Detect Enable
+ST-FOSHD2-GV7-NAME = Motion Send Mail
+ST-FOSHD2-GV8-NAME = Motion Sensitivity
+ST-FOSHD2-GV9-NAME = Motion Compensation
+ST-FOSHD2-GV10-NAME = Motion Trigger Interval
+ST-FOSHD2-GV11-NAME = Camera System Version
+ST-FOSHD2-GV12-NAME = Polyglot Node Version Minor
+ST-FOSHD2-GV13-NAME = Motion Snapshot Interval
+ST-FOSHD2-GV14-NAME = Motion Snap Picture
+ST-FOSHD2-GV15-NAME = Motion Record
+ST-FOSHD2-GV16-NAME = Motion Ring
+
+CMD-ST-NAME = Query
+CMD-FOSHD2-REBOOT-NAME = Reboot
+CMD-FOSHD2-SET_IRLED-NAME = Set IR LED Mode
+CMD-FOSHD2-SET_ALMOA-NAME = Set Motion Detect Enable
+CMD-FOSHD2-SET_MO_MAIL-NAME = Set Motion Send Mail
+CMD-FOSHD2-SET_ALMOS-NAME = Set Motion Sensitivity
+CMD-FOSHD2-SET_ALMOC-NAME = Set Motion Compensation
+CMD-FOSHD2-SET_POS-NAME = Set Position
+CMD-FOSHD2-SET_MO_TRIG-NAME = Set Motion Trigger Interval
+CMD-FOSHD2-SET_MO_RING-NAME = Set Motion Ring
+CMD-FOSHD2-SET_MO_PIC-NAME = Set Motion Snap Picture
+CMD-FOSHD2-SET_MO_PIC_INT-NAME = Set Motion Snap Picture Interval
+CMD-FOSHD2-SET_MO_REC-NAME = Set Motion Record
+
+
+POS-1 = Preset 1
+POS-2 = Preset 2
+POS-3 = Preset 3
+POS-4 = Preset 4
+POS-5 = Preset 5
+POS-6 = Preset 6
+POS-7 = Preset 7
+POS-8 = Preset 8
+POS-9 = Preset 9
+POS-10 = Preset 10
+POS-11 = Preset 11
+POS-12 = Preset 12
+POS-13 = Preset 13
+POS-14 = Preset 14
+POS-15 = Preset 15
+POS-16 = Preset 16
+
+ALMOS-0 = Sensitivity 0 (Highest)
+ALMOS-1 = Sensitivity 1
+ALMOS-2 = Sensitivity 2
+ALMOS-3 = Sensitivity 3
+ALMOS-4 = Sensitivity 4
+ALMOS-5 = Sensitivity 5
+ALMOS-6 = Sensitivity 6
+ALMOS-7 = Sensitivity 7
+ALMOS-8 = Sensitivity 8
+ALMOS-9 = Sensitivity 9 (Lowest)
+
+MOS04-0 = Low
+MOS04-1 = Medium
+MOS04-2 = High
+MOS04-3 = Lower
+MOS04-4 = Lowest
+
+# Motion snap interval
+MOP5-1 = 1s
+MOP5-2 = 2s
+MOP5-3 = 3s
+MOP5-4 = 4s
+MOP5-5 = 5s
+
+# Motion trigger interval
+MOT10-0 = 5s
+MOT10-1 = 6s
+MOT10-2 = 7s
+MOT10-3 = 8s
+MOT10-4 = 9s
+MOT10-5 = 10s
+MOT10-6 = 11s
+MOT10-7 = 12s
+MOT10-8 = 13s
+MOT10-9 = 14s
+MOT10-10 = 15s
+
+# Mode: Off, On
+MOO-0 = Off
+MOO-1 = On
+
+# Mode: Auto, Off, On, Unknown
+MAOOU-0 = Auto
+MAOOU-1 = Off
+MAOOU-2 = On
+MAOOU-3 = Unknown
+
+# Mode: Auto, Off, On
+MAOO-0 = Auto
+MAOO-1 = Off
+MAOO-2 = On
+
+# Status: Off, On, Unknown
+SOOU-0 = Off
+SOOU-1 = On
+SOOU-2 = Unknown
+
+# Mode Off, On, Auto (not currently used)
+MOOA-0 = Off
+MOOA-1 = On
+MOOA-2 = Auto
+
+# led_mode for the network led on the back of the camera.
+# It is 0 (zero) 1 (one) O (Letter O=Off)
+#  http://ip/set_misc.cgi?led_mode=0 : Led indicates network connection
+#  http://ip/set_misc.cgi?led_mode=1 : Led indicates connected network type 
+#  http://ip/set_misc.cgi?led_mode=2 : Led deactivated except during camera boot
+NLEDM-0 = Network Connection
+NLEDM-1 = Network Type
+NLEDM-2 = Off
+
+# -2 = off
+# -1 = auto
+
+IRLEDM-2
+
+# Authorization Mode
+AUTHM-0 = Basic
+AUTHM-1 = Digest
+
+# Camera sub nodes.
+ND-CamMotion-NAME = Camera Motion Sensor
+ND-CamMotion-ICON = Input
+
+# Try this one.
+ST-CAMNM-ST-NAME = Motion
+
+# Not these.
+#ST-CAMNM-NAME = Motion
+#CMD-CAMNM-ST-NAME = Motion
+#CMDP-CAMNM-ST-NAME = Motion
+
+# Camera Controls
+ST-CAM-GV1-NAME = Polyglot Node Version Major
+ST-CAM-GV2-NAME = IP Address
+ST-CAM-GV3-NAME = Port
+ST-CAM-GV4-NAME = Responding
+ST-CAM-GV5-NAME = Network LED Mode
+ST-CAM-GV6-NAME = Alarm Motion Armed
+ST-CAM-GV7-NAME = Alarm Send Mail
+ST-CAM-GV8-NAME = Motion Sensitivity
+ST-CAM-GV9-NAME = Motion Compensation
+ST-CAM-GV10-NAME = Authorization Mode
+ST-CAM-GV11-NAME = Camera System Version
+ST-CAM-GV12-NAME = Polyglot Node Version Minor
+ST-CAM-GV13-NAME = Upload Interval
+
+#
+# Amcrest
+#
+ND-Amcrest1-NAME = Amcrest Camera Type 1
+ND-Amcrest1-ICON = Input
+ND-Amcrest1-ICON = Input
+
+# Camera Controls
+ST-AMC1-GV1-NAME = Camera System Version
+ST-AMC1-GV2-NAME = IP Address
+ST-AMC1-GV3-NAME = Port
+ST-AMC1-GV4-NAME = Responding
+ST-AMC1-GV5-NAME = Video Motion Detect
+ST-AMC1-GV6-NAME = VMD Record
+ST-AMC1-GV7-NAME = VMD Send Email
+ST-AMC1-GV8-NAME = VMD Snapshot
+ST-AMC1-GV9-NAME = VMD Snapshot Count
+
+CMD-AMC1-ST-NAME = Query
+CMD-AMC1-REBOOT-NAME = Reboot
+CMD-AMC1-SET_VMD_ENABLE-NAME=Set Video Motion Detect
+CMD-AMC1-SET_VMD_RECORD-NAME=Set Video Motion Detect Record
+CMD-AMC1-SET_VMD_EMAIL-NAME=Set Video Motion Detect Email
+CMD-AMC1-SET_VMD_SNAPSHOT-NAME=Set Video Motion Detect Snapshot
+CMD-AMC1-SET_VMD_SNAPSHOT_COUNT-NAME=Set Video Motion Detect Snapshot Count
+CMD-AMC1-SET_POS-NAME=Set Position

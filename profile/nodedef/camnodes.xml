@@ -1,0 +1,245 @@
+<nodeDefs>
+
+  <!-- === Camera Server Holds all Camera Nodes ========================================  -->
+
+  <nodeDef id="CameraController" nodeType="139" nls="CAMC">
+    <sts>
+      <st id="ST" editor="BOOL" />
+      <st id="GV1" editor="FLOAT" />
+      <st id="GV2" editor="FLOAT" />
+      <st id="GV3" editor="I_INTEGER" />
+      <st id="GV4" editor="I_FOSCAM_MJPEG" />
+      <st id="GV5" editor="I_DM" />
+      <!-- shortpoll -->
+      <st id="GV6" editor="I_INTEGER" />
+      <!-- longpoll -->
+      <st id="GV7" editor="I_INTEGER" />
+    </sts>
+    <cmds>
+      <sends>
+	<cmd id="DON" />
+      </sends>
+      <accepts>
+	<cmd id="QUERY" />
+	<cmd id="DISCOVER" />
+	<!--  Foscam MJPEG Polling -->
+        <cmd id="SET_FOSCAM_MJPEG">
+          <p id="" editor="I_FOSCAM_MJPEG" init="GV3" />
+        </cmd>
+	<!--  Log Debug Mode -->
+        <cmd id="SET_DM">
+          <p id="" editor="I_DM" init="GV4"/>
+        </cmd>
+        <cmd id="SET_SHORTPOLL">
+          <p id="" editor="I_INTEGER" init="GV6"/>
+        </cmd>
+        <cmd id="SET_LONGPOLL">
+          <p id="" editor="I_INTEGER" init="GV7"/>
+        </cmd>
+      </accepts>
+    </cmds>
+  </nodeDef>
+
+  <!-- === Foscam MJPEG Camera ============================================================  -->
+
+  <nodeDef id="FoscamMJPEG" nodeType="139" nls="CAM">
+    <sts>
+      <st id="GV11" editor="FLOAT" />
+      <st id="GV10" editor="I_AUTHM" />
+      <st id="GV4" editor="BOOL" />
+      <st id="GV5" editor="I_NLEDM" />
+      <st id="GV6" editor="BOOL" />
+      <st id="GV7" editor="BOOL" />
+      <st id="GV13" editor="I_INTEGER" />
+      <st id="GV9" editor="BOOL" />
+      <st id="GV8" editor="I_ALMOS" />
+    </sts>
+    <cmds>
+      <sends />
+      <accepts>
+	<!--  Authoirzation Mode -->
+        <cmd id="SET_AUTHM">
+          <p id="" editor="I_AUTHM" init="GV10" />
+        </cmd>
+	<!--  The IR LED -->
+        <cmd id="SET_IRLED">
+          <p id="" editor="I_MOO" />
+        </cmd>
+	<!--  The Network LED flasshing -->
+        <cmd id="SET_LEDM">
+          <p id="" editor="I_NLEDM" init="GV5" />
+        </cmd>
+	<!--  Enable motion alarm -->
+        <cmd id="SET_ALMOA">
+          <p id="" editor="BOOL" init="GV6" />
+        </cmd>
+	<!--  Send email for motion alarm -->
+        <cmd id="SET_ALML">
+          <p id="" editor="BOOL" init="GV7" />
+        </cmd>
+	<!--  Upload Interval -->
+        <cmd id="SET_UPINT">
+          <p id="" editor="I_INTEGER" init="GV13" />
+        </cmd>
+	<!-- Enable alarm motion compensation or not when the light changes suddently，0：no，1：yes  -->
+        <cmd id="SET_ALMOC">
+          <p id="" editor="BOOL" init="GV9" />
+        </cmd>
+	<!-- Motion Sensitivity: 0-9：high-low (but I think it is low-high) -->
+        <cmd id="SET_ALMOS">
+          <p id="" editor="I_ALMOS" init="GV8" />
+        </cmd>
+	<!-- Set camera position to one of 16 presets -->
+        <cmd id="SET_POS">
+          <p id="" editor="I_POS16" />
+        </cmd>
+	<cmd id="REBOOT" />
+	<cmd id="QUERY" />
+      </accepts>
+    </cmds>
+  </nodeDef>
+
+  <!-- === Foscam H.264 Camera ============================================================  -->
+
+  <nodeDef id="FoscamHD2" nodeType="139" nls="FOSHD2">
+    <sts>
+      <st id="GV11" editor="FLOAT" />     <!-- Camera System Version -->
+      <st id="GV4" editor="BOOL" />       <!-- Responding -->
+      <st id="GV5" editor="I_MAOOU" />    <!-- IR LED Mode -->
+      <st id="GV6" editor="BOOL" />       <!-- Alarm Motion Armed -->
+      <st id="GV10" editor="I_MOT10" />   <!-- Alarm Motion Trigger Interval -->
+      <st id="GV16" editor="BOOL" />       <!-- Motion Ring -->
+      <st id="GV7" editor="BOOL" />       <!-- Motion Send Mail -->
+      <st id="GV14" editor="BOOL" />      <!-- Motion Picture -->
+      <st id="GV13" editor="I_MOP5" />    <!-- Motion Snap Interval -->
+      <st id="GV15" editor="BOOL" />      <!-- Motion Record -->
+      <st id="GV8" editor="I_MOS04" />    <!-- Motion Sensitivity -->
+    </sts>
+    <cmds>
+      <sends />
+      <accepts>
+	<!--  The IR LED -->
+        <cmd id="SET_IRLED">
+          <p id="" editor="I_MAOO" init="GV5"/>
+        </cmd>
+	<!--  Enable motion alarm -->
+        <cmd id="SET_ALMOA">
+          <p id="" editor="BOOL" init="GV6" />
+        </cmd>
+	<!--  Trigger Interval -->
+        <cmd id="SET_MO_TRIG">
+          <p id="" editor="I_MOT10" init="GV10" />
+        </cmd>
+	<!-- Motion Sensitivity: 0-9：high-low (but I think it is low-high) -->
+        <cmd id="SET_ALMOS">
+          <p id="" editor="I_MOS04" init="GV8" />
+        </cmd>
+	<!--  ring for motion alarm -->
+        <cmd id="SET_MO_RING">
+          <p id="" editor="BOOL" init="GV16" />
+        </cmd>
+	<!--  Send email for motion alarm -->
+        <cmd id="SET_MO_MAIL">
+          <p id="" editor="BOOL" init="GV7" />
+        </cmd>
+	<!--  Send picture for motion alarm -->
+        <cmd id="SET_MO_PIC">
+          <p id="" editor="BOOL" init="GV14" />
+        </cmd>
+	<!--  Send picture for motion alarm snap interval-->
+        <cmd id="SET_MO_PIC_INT">
+          <p id="" editor="I_MOP5" init="GV13" />
+        </cmd>
+	<!--  Enable record for motion alarm -->
+        <cmd id="SET_MO_REC">
+          <p id="" editor="BOOL" init="GV15" />
+        </cmd>
+	<!-- Set camera position to one of 16 presets -->
+        <cmd id="SET_POS">
+          <p id="" editor="I_POS16" />
+        </cmd>
+	<cmd id="REBOOT" />
+	<cmd id="QUERY" />
+      </accepts>
+    </cmds>
+  </nodeDef>
+
+  <!-- === Amcrest Camera ============================================================  -->
+
+  <nodeDef id="Amcrest1" nodeType="139" nls="AMC1">
+    <sts>
+      <st id="GV1" editor="FLOAT" />     <!-- Camera System Version -->
+      <st id="GV4" editor="BOOL" />      <!-- Responding -->
+      <st id="GV5" editor="BOOL" />      <!-- Video Motion Detect Enable -->
+      <st id="GV6" editor="BOOL" />      <!--   - Record     -->
+      <st id="GV7" editor="BOOL" />      <!--   - Send Email -->
+      <st id="GV8" editor="BOOL" />      <!--   - Snapshot   -->
+      <st id="GV9" editor="I_135" />    <!--   - Snap Count -->
+    </sts>
+    <cmds>
+      <sends />
+      <accepts>
+	<!--  Video Motion Detect Enable -->
+        <cmd id="SET_VMD_ENABLE">
+          <p id="" editor="BOOL" init="GV5" />
+        </cmd>
+	<!--  -->
+        <cmd id="SET_VMD_RECORD">
+          <p id="" editor="BOOL" init="GV6" />
+        </cmd>
+	<!--  -->
+        <cmd id="SET_VMD_EMAIL">
+          <p id="" editor="BOOL" init="GV7" />
+        </cmd>
+	<!--   -->
+        <cmd id="SET_VMD_SNAPSHOT">
+          <p id="" editor="BOOL" init="GV8" />
+        </cmd>
+	<!--  Send email for motion alarm -->
+        <cmd id="SET_VMD_SNAPSHOT_COUNT">
+          <p id="" editor="I_135" init="GV9" />
+        </cmd>
+	<!-- Set camera position to one of 16 presets -->
+        <cmd id="SET_POS">
+          <p id="" editor="I_POS16" />
+        </cmd>
+	<cmd id="REBOOT" />
+	<cmd id="QUERY" />
+      </accepts>
+    </cmds>
+  </nodeDef>
+
+  <!-- === Camera Motion Node ============================================================  -->
+  <nodeDef id="CamMotion" nodeType="139" nls="CAMNM">
+    <sts>
+      <st id="ST" editor="I_OOU" />
+    </sts>
+    <cmds>
+      <sends>
+        <cmd id="DON" />
+        <cmd id="DOF" />
+      </sends>
+      <accepts>
+	<cmd id="QUERY" />
+      </accepts>
+    </cmds>
+  </nodeDef>
+
+  <!-- === Some other Camera ============================================================  -->
+  <nodeDef id="FCAM2" nodeType="139" nls="CAM">
+    <sts>
+      <st id="GV1" editor="I_INTEGER" />
+      <st id="GV2" editor="I_INTEGER" />
+      <st id="GV3" editor="I_INTEGER" />
+      <st id="GV4" editor="I_INTEGER" />
+    </sts>
+    <cmds>
+      <sends />
+      <accepts>
+	<cmd id="QUERY" />
+      </accepts>
+    </cmds>
+  </nodeDef>
+
+
+</nodeDefs>

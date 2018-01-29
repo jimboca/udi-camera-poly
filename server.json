@@ -1,20 +1,20 @@
 {
-    "name": "PythonTemplate",
+    "name": "Camera",
     "docs": "https://github.com/Einstein42/udi-poly-template-python",
-    "type": "python",
-    "executable": "name-poly.py",
+    "type": "python3",
+    "executable": "camera-poly.py",
     "install": "install.sh",
-    "description": "My Node Server",
+    "description": "Camera Server",
     "notice": "Your disclaimer here",
     "shortPoll": "5",
     "longPoll": "60",
     "credits": [
         {
-            "title": "mypoly: a NodeServer for My Integration",
+            "title": "udi-camera-poly: a NodeServer for My Integration",
             "author": "Your Name Here",
-            "version": "2.0.1",
-            "date": "November 8, 2017",
-            "source": "https://github.com/Einstein42/udi-poly-template-python",
+            "version": "2.0.0",
+            "date": "Janurary 28, 2017",
+            "source": "https://github.com/Einstein42/udi-camera-poly",
             "license": "https://raw.githubusercontent.com/Einstein42/udi-poly-template-python/master/LICENSE"
         }
     ]
