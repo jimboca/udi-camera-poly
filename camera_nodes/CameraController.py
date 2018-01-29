@@ -60,11 +60,11 @@ class CameraController(polyinterface.Controller):
         self.l_info('start',"...")
         # TODO; This is only necessary when drivers change?
         self.addNode(self,update=True)
-        self.num_cams     = self.getDriver('GV3')
-        self.foscam_mjpeg = self.getDriver('GV4')
-        self.debug_mode   = self.getDriver('GV5')
-        self.short_poll   = self.getDriver('GV6')
-        self.long_poll    = self.getDriver('GV7')
+        self.num_cams       = self.getDriver('GV3')
+        self.foscam_polling = self.getDriver('GV4')
+        self.debug_mode     = self.getDriver('GV5')
+        self.short_poll     = self.getDriver('GV6')
+        self.long_poll      = self.getDriver('GV7')
         self.query();
         self.load_params()
         self.add_polyconfig_cams()
@@ -98,7 +98,7 @@ class CameraController(polyinterface.Controller):
         self.setDriver('GV1', self.serverdata['version_major'])
         self.setDriver('GV2', self.serverdata['version_minor'])
         self.set_num_cams(self.num_cams)
-        self.set_foscam_mjpeg(self.foscam_mjpeg)
+        self.set_foscam_polling(self.foscam_polling)
         self.set_debug_mode(self.debug_mode)
         self.set_short_poll(self.short_poll)
         self.set_long_poll(self.long_poll)
@@ -111,10 +111,10 @@ class CameraController(polyinterface.Controller):
         Do discovery here. Does not have to be called discovery. Called from example
         controller start method and from DISCOVER command recieved from ISY as an exmaple.
         """
-        if self.foscam_mjpeg > 0:
+        if self.foscam_polling > 0:
             self.discover_foscam(manifest)
         else:
-            self.l_info("discover","Not Polling for Foscam MJPEG cameras %s" % (self.foscam_mjpeg))
+            self.l_info("discover","Not Polling for Foscam MJPEG cameras %s" % (self.foscam_polling))
             self.set_num_cams(self.num_cams)
         self.l_info('discover',"Done adding cameras")
 
@@ -193,7 +193,7 @@ class CameraController(polyinterface.Controller):
         pass
         
     def discover_foscam(self):
-        self.l_info("discover_foscam"," Polling for Foscam MJPEG cameras %s" % (self.foscam_mjpeg))
+        self.l_info("discover_foscam"," Polling for Foscam cameras %s" % (self.foscam_polling))
         cams = foscam_poll(LOGGER)
         self.l_info("discover_foscam"," Got cameras: " + str(cams))
         for cam in cams:
@@ -237,11 +237,11 @@ class CameraController(polyinterface.Controller):
     def incr_num_cams(self):
         self.set_num_cams(self.num_cams + 1)
 
-    def set_foscam_mjpeg(self,val):
+    def set_foscam_polling(self,val):
         if val is None:
             val = 0
-        self.foscam_mjpeg = int(val)
-        self.setDriver('GV4', self.foscam_mjpeg)
+        self.foscam_polling = int(val)
+        self.setDriver('GV4', self.foscam_polling)
         
     def set_debug_mode(self,val):
         if val is None:
@@ -267,7 +267,7 @@ class CameraController(polyinterface.Controller):
         self.l_info("_cmd_install_profile","installing...")
         self.poly.installprofile()
 
-    def cmd_set_foscam_mjpeg(self,command):
+    def cmd_set_foscam_polling(self,command):
         """ Enable/Disable Foscam UDP Searching
               0 = Off
               1 = 10 second query
@@ -276,8 +276,8 @@ class CameraController(polyinterface.Controller):
               4 = 60 second query
         """
         val = int(command.get('value'))
-        self.l_info("cmd_set_foscam_mjpeg",val)
-        self.set_foscam_mjpeg(val)
+        self.l_info("cmd_set_foscam_polling",val)
+        self.set_foscam_polling(val)
     
     def cmd_set_debug_mode(self,command):
         val = command.get('value')
