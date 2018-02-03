@@ -1,5 +1,9 @@
 
 import polyinterface
+import os, json, logging, requests, threading,  re, socket, yaml
+# SocketServer,
+from requests.auth import HTTPDigestAuth,HTTPBasicAuth
+from http.client import BadStatusLine  # Python 3.x
 from foscam_poll import foscam_poll
 from camera_nodes import *
 from camera_funcs import myint,long2ip,get_server_data
@@ -67,7 +71,7 @@ class CameraController(polyinterface.Controller):
         self.long_poll      = self.getDriver('GV7')
         self.query();
         self.load_params()
-        self.add_polyconfig_cams()
+        self.add_existing_cams()
         self.add_config_cams()
 
     def shortPoll(self):
@@ -112,7 +116,7 @@ class CameraController(polyinterface.Controller):
         controller start method and from DISCOVER command recieved from ISY as an exmaple.
         """
         if self.foscam_polling > 0:
-            self.discover_foscam(manifest)
+            self.discover_foscam()
         else:
             self.l_info("discover","Not Polling for Foscam MJPEG cameras %s" % (self.foscam_polling))
             self.set_num_cams(self.num_cams)
@@ -127,11 +131,19 @@ class CameraController(polyinterface.Controller):
         """
         self.l_info('delete','Oh God I\'m being deleted. Nooooooooooooooooooooooooooooooooooooooooo.')
 
+    def get_node(self,address):
+        self.l_info('get_node',"adress={0}".format(address))
+        for node in self.nodes:
+            #self.l_debug('get_node',"node={0}".format(node))
+            if self.nodes[node].address == address:
+                return self.nodes[node]
+        return None
+
     def load_params(self):
         """
         Load the user defined params
         user = The user name to log into cameras
-        passwrd = And the matching password
+        password = And the matching password
         """
         if 'user' in self.polyConfig['customParams']:
             self.user = self.polyConfig['customParams']['user']
@@ -144,12 +156,16 @@ class CameraController(polyinterface.Controller):
             self.l_error('load_params',"password not defined in customParams, please add it.  Using admin")
             self.password = 'admin'
 
-    def add_polyconfig_cams(self):
+    def add_existing_cams(self):
         """
         Called on startup to add the cameras from the config
         """
-        # TODO: Add code to loop over self.polyConfig["nodes"] ?
-        pass
+        for address in self._nodes:
+            node = self._nodes[address]
+            self.l_info("add_existing_cams","node={0} = {1}".format(address,node))
+            if node['node_def_id'] == "FoscamMJPEG":
+                self.l_info("discover_foscam","Adding FoscamMJPEG camera: %s" % (node['name']))
+                self.addNode(FoscamMJPEG(self, self.user, self.password, node_data=node))
 
     def add_config_cams(self):
         """
@@ -201,21 +217,63 @@ class CameraController(polyinterface.Controller):
             self.l_info("discover_foscam","Checking to add camera: %s %s" % (cam['id'], cam['name']))
             lnode = self.get_node(cam['id'])
             if lnode:
-                self.l_info("discover_foscam","TODO: Already exists, updating %s %s" % (cam['id'], cam['name']))
-                #lnode.update_config(self.parent.cam_config['user'], self.parent.cam_config['password'], udp_data=cam)
+                self.l_info("discover_foscam","Already exists, updating %s %s" % (cam['id'], cam['name']))
+                lnode.update_config(self.user, self.password, udp_data=cam)
+                lnode.update()
             else:
                 if cam['mtype'] == "MJPEG":
                     self.l_info("discover_foscam","Adding FoscamMJPEG camera: %s" % (cam['name']))
-                    FoscamMJPEG(self.parent, True, self.parent.cam_config['user'], self.parent.cam_config['password'], udp_data=cam)
+                    self.addNode(FoscamMJPEG(self, self.user, self.password, udp_data=cam))
                     self.incr_num_cams()
+
                 elif cam['mtype'] == "HD2":
                     self.l_info("discover_foscam","Adding FoscamHD camera: %s" % (cam['name']))
-                    FoscamHD2(self.parent, True, self.parent.cam_config['user'], self.parent.cam_config['password'], udp_data=cam)
+                    self.addNode(FoscamHD2(self, self.user, self.password, udp_data=cam))
                     self.incr_num_cams()
+                    
                 else:
                     self.l_error("discover_foscam","Unknown type %s for Foscam Camera %s" % (cam['type'],cam['name']))
             self.l_info("discover_foscam","Done")
         
+    def http_get(self,ip,port,user,password,path,payload,auth_mode=0):
+        url = "http://{}:{}/{}".format(ip,port,path)
+        
+        self.l_debug("http_get","Sending: %s %s auth_mode=%d" % (url, payload, auth_mode) )
+        if auth_mode == 0:
+            auth = HTTPBasicAuth(user,password)
+        elif auth_mode == 1:
+            auth = HTTPDigestAuth(user,password)
+        else:
+            self.l_error('http_get',"Unknown auth_mode '%s' for request '%s'.  Must be 0 for 'digest' or 1 for 'basic'." % (auth_mode, url) )
+            return False
+            
+        try:
+            response = requests.get(
+                url,
+                auth=auth,
+                params=payload,
+                timeout=5
+            )
+        # This is supposed to catch all request excpetions.
+        except requests.exceptions.RequestException as e:
+            self.l_error('http_get',"Connection error for %s: %s" % (url, e))
+            return False
+        self.l_debug('http_get',' Got: code=%s' % (response.status_code))
+        if response.status_code == 200:
+            #self.l_debug('http_get',"http_get: Got: text=%s" % response.text)
+            return response.text
+        elif response.status_code == 400:
+            self.l_error('http_get',"Bad request: %s" % (url) )
+        elif response.status_code == 404:
+            self.l_error('http_get',"Not Found: %s" % (url) )
+        elif response.status_code == 401:
+            # Authentication error
+            self.l_error('http_get',
+                "Failed to authenticate, please check your username and password")
+        else:
+            self.l_error('http_get',"Unknown response %s: %s" % (response.status_code, url) )
+        return False
+
     def l_info(self, name, string):
         LOGGER.info("%s:%s: %s" %  (self.id,name,string))
         
@@ -264,7 +322,7 @@ class CameraController(polyinterface.Controller):
         self.polyConfig['longPoll'] = val
         
     def cmd_install_profile(self,command):
-        self.l_info("_cmd_install_profile","installing...")
+        self.l_info("cmd_install_profile","installing...")
         self.poly.installprofile()
 
     def cmd_set_foscam_polling(self,command):
