@@ -47,9 +47,9 @@
 
   <nodeDef id="FoscamMJPEG" nodeType="139" nls="CAM">
     <sts>
+      <st id="ST" editor="BOOL" />
       <st id="GV11" editor="FLOAT" />
       <st id="GV10" editor="I_AUTHM" />
-      <st id="GV4" editor="BOOL" />
       <st id="GV5" editor="I_NLEDM" />
       <st id="GV6" editor="BOOL" />
       <st id="GV7" editor="BOOL" />
@@ -106,16 +106,16 @@
 
   <nodeDef id="FoscamHD2" nodeType="139" nls="FOSHD2">
     <sts>
+      <st id="ST" editor="BOOL" />       <!-- Responding -->
       <st id="GV11" editor="FLOAT" />     <!-- Camera System Version -->
-      <st id="GV4" editor="BOOL" />       <!-- Responding -->
       <st id="GV5" editor="I_MAOOU" />    <!-- IR LED Mode -->
       <st id="GV6" editor="BOOL" />       <!-- Alarm Motion Armed -->
       <st id="GV10" editor="I_MOT10" />   <!-- Alarm Motion Trigger Interval -->
-      <st id="GV16" editor="BOOL" />       <!-- Motion Ring -->
+      <st id="GV0" editor="BOOL" />       <!-- Motion Ring -->
       <st id="GV7" editor="BOOL" />       <!-- Motion Send Mail -->
       <st id="GV14" editor="BOOL" />      <!-- Motion Picture -->
       <st id="GV13" editor="I_MOP5" />    <!-- Motion Snap Interval -->
-      <st id="GV15" editor="BOOL" />      <!-- Motion Record -->
+      <st id="GV4" editor="BOOL" />      <!-- Motion Record -->
       <st id="GV8" editor="I_MOS04" />    <!-- Motion Sensitivity -->
     </sts>
     <cmds>
@@ -139,7 +139,7 @@
         </cmd>
 	<!--  ring for motion alarm -->
         <cmd id="SET_MO_RING">
-          <p id="" editor="BOOL" init="GV16" />
+          <p id="" editor="BOOL" init="GV0" />
         </cmd>
 	<!--  Send email for motion alarm -->
         <cmd id="SET_MO_MAIL">
@@ -155,7 +155,7 @@
         </cmd>
 	<!--  Enable record for motion alarm -->
         <cmd id="SET_MO_REC">
-          <p id="" editor="BOOL" init="GV15" />
+          <p id="" editor="BOOL" init="GV4" />
         </cmd>
 	<!-- Set camera position to one of 16 presets -->
         <cmd id="SET_POS">
@@ -171,8 +171,8 @@
 
   <nodeDef id="Amcrest1" nodeType="139" nls="AMC1">
     <sts>
+      <st id="ST" editor="BOOL" />      <!-- Responding -->
       <st id="GV1" editor="FLOAT" />     <!-- Camera System Version -->
-      <st id="GV4" editor="BOOL" />      <!-- Responding -->
       <st id="GV5" editor="BOOL" />      <!-- Video Motion Detect Enable -->
       <st id="GV6" editor="BOOL" />      <!--   - Record     -->
       <st id="GV7" editor="BOOL" />      <!--   - Send Email -->

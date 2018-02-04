@@ -1,5 +1,5 @@
 
-import os,socket,struct,json
+import os,socket,struct,json,re
 
 def myint(value):
     """ round and convert to int """
@@ -87,6 +87,11 @@ def int2str(value):
 
 def str2int(value):
     return bool2int(str2bool(value))
+
+# Removes invalid charaters for ISY Node description
+def get_valid_node_name(name):
+    # Remove <>`~!@#$%^&*(){}[]?/\;:"'` characters from names
+    return re.sub(r"[<>`~!@#$%^&*(){}[\]?/\\;:\"']+", "", name)
 
 def get_server_data(logger):
     # Read the SERVER info from the json.

@@ -9,6 +9,7 @@ import sys
 import time
 import select
 from struct import unpack,pack
+from camera_funcs import get_valid_node_name
 
 TIMEOUT = 6 # Run for 30 seconds max.
 PING_INTERVAL    = 2  # Once every 5 seconds
@@ -100,7 +101,7 @@ def foscam_poll(logger=None,verbose=False):
                 'type':      type,#rstrip(b'\x00'),
                 'mtype':     mtype,
                 'id':        id.rstrip('\x00'),
-                'name':      name.rstrip('\x00'),
+                'name':      get_valid_node_name(name.rstrip('\x00')),
                 'ip':        socket.inet_ntoa(pack('!I',ip_i)),
                 'port':      port,
                 'mask':      socket.inet_ntoa(pack('!I',mask_i)), 

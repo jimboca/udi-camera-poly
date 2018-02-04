@@ -63,16 +63,34 @@ class CameraController(polyinterface.Controller):
         """
         self.l_info('start',"...")
         # TODO; This is only necessary when drivers change?
-        self.addNode(self,update=True)
+        #self.addNode(self,update=True)
         self.num_cams       = self.getDriver('GV3')
         self.foscam_polling = self.getDriver('GV4')
         self.debug_mode     = self.getDriver('GV5')
-        self.short_poll     = self.getDriver('GV6')
-        self.long_poll      = self.getDriver('GV7')
+
+        # Short Poll
+        val = self.getDriver('GV6')
+        self.l_debug("start","shortPoll={0} GV6={1}".format(self.polyConfig['shortPoll'],val))
+        if val is None or int(val) == 0:
+            val = self.polyConfig['shortPoll']
+            self.setDriver('GV6',val)
+        else:
+            self.polyConfig['shortPoll'] = int(val)
+        self.short_poll = val
+            
+        # Long Poll
+        val = self.getDriver('GV7')
+        self.l_debug("start","longPoll={0} GV7={1}".format(self.polyConfig['longPoll'],val))
+        if val is None or int(val) == 0:
+            val = self.polyConfig['longPoll']
+            self.setDriver('GV7',val)
+        else:
+            self.polyConfig['longPoll'] = int(val)
+        self.long_poll = val
+
         self.query();
         self.load_params()
-        self.add_existing_cams()
-        self.add_config_cams()
+        self.add_all_cams()
 
     def shortPoll(self):
         """
@@ -145,16 +163,32 @@ class CameraController(polyinterface.Controller):
         user = The user name to log into cameras
         password = And the matching password
         """
+        default_user = "YourCameraUserName"
+        default_password = "YourCameraPassword"
+
         if 'user' in self.polyConfig['customParams']:
             self.user = self.polyConfig['customParams']['user']
         else:
             self.l_error('load_params',"user not defined in customParams, please add it.  Using admin")
-            self.user = 'admin'
+            self.user = default_user
+
         if 'password' in self.polyConfig['customParams']:
             self.password = self.polyConfig['customParams']['password']
         else:
             self.l_error('load_params',"password not defined in customParams, please add it.  Using admin")
-            self.password = 'admin'
+            self.password = default_password
+
+        # Make sure they are in the params
+        self.addCustomParam({'password': self.password, 'user': self.user, 'cam_someaddress': '{ "type": "Amcrest", "host": "host_or_IP", "port": "port_number" }'})
+
+        self.removeNoticesAll()
+        if self.user == default_user or self.password == default_password:
+            self.addNotice("Please set proper camera user and password in Configuration page, and restart this nodeserver")
+            
+    def add_all_cams(self):
+        self.set_num_cams(0)
+        self.add_existing_cams()
+        self.add_config_cams()
 
     def add_existing_cams(self):
         """
@@ -163,9 +197,17 @@ class CameraController(polyinterface.Controller):
         for address in self._nodes:
             node = self._nodes[address]
             self.l_info("add_existing_cams","node={0} = {1}".format(address,node))
-            if node['node_def_id'] == "FoscamMJPEG":
-                self.l_info("discover_foscam","Adding FoscamMJPEG camera: %s" % (node['name']))
+            if node['address'] == self.address:
+                # Ignore myself
+                pass
+            elif node['node_def_id'] == "FoscamMJPEG":
+                self.l_info("add_existing_cams","Adding FoscamMJPEG camera: %s" % (node['name']))
                 self.addNode(FoscamMJPEG(self, self.user, self.password, node_data=node))
+            elif node['node_def_id'] == "FoscamHD2":
+                self.l_info("add_existing_cams","Adding FoscamMJPEG camera: %s" % (node['name']))
+                self.addNode(FoscamHD2(self, self.user, self.password, node_data=node))
+            else:
+                self.l_error("add_existing_cams","Unknown camera id %s for %s" % (node['node_def_id'],node['name']))
 
     def add_config_cams(self):
         """
@@ -219,7 +261,7 @@ class CameraController(polyinterface.Controller):
             if lnode:
                 self.l_info("discover_foscam","Already exists, updating %s %s" % (cam['id'], cam['name']))
                 lnode.update_config(self.user, self.password, udp_data=cam)
-                lnode.update()
+                lnode.update_drivers()
             else:
                 if cam['mtype'] == "MJPEG":
                     self.l_info("discover_foscam","Adding FoscamMJPEG camera: %s" % (cam['name']))

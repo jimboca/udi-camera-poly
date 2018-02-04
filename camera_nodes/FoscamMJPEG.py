@@ -48,8 +48,9 @@ class FoscamMJPEG(polyinterface.Node):
             self.name      = node_data['name']
             self.address   = node_data['address']
         else:
-            self.parent.send_error("FoscamMJPEG:init:%s: One of manifest or udp_data must be passed in." % (address))
+            self.l_error("__init__","one of node_data or udp_data must be passed in")
             return False
+        self.st = False
         super(FoscamMJPEG, self).__init__(controller, self.address, self.address, self.name)
 
     # This is called by __init__ and the Controller during a discover
@@ -61,13 +62,12 @@ class FoscamMJPEG(polyinterface.Node):
         self.full_sys_ver = str(udp_data['sys'])
         self.sys_ver   = self.parse_sys_ver(self.full_sys_ver)
 
-    def update(self):
+    def update_drivers(self):
         self.setDriver('ST', 1)
         self.setDriver('GV2',  ip2long(self.ip))
         self.setDriver('GV3',  self.port)
         self.setDriver('GV10', self.auth_mode)
         self.setDriver('GV11', self.sys_ver)
-        self.query()
 
     def start(self):
         """
@@ -76,16 +76,29 @@ class FoscamMJPEG(polyinterface.Node):
         and we get a return result from Polyglot. Only happens once.
         """
         if self.init:
-            self.update()
+            # __init__ sets init to True when upd_data is passed in, update_drivers needs to be called.
+            self.update_drivers()
         else:
-            self.l_info("start","ip={0} port={1} auth_mode={2}".format(self.getDriver('GV2'),self.getDriver('GV3'),self.getDriver('GV10')))
-            self.auth_mode = int(self.getDriver('GV10'))
-            self.ip        = long2ip(int(self.getDriver('GV2')))
-            self.port      = self.getDriver('GV3')
+            # It's an existing Node, so get the info we need from it.
+            g_ip    = self.getDriver('GV2')
+            g_port  = self.getDriver('GV3')
+            g_authm = self.getDriver('GV10')
+            self.l_info("start","ip={0} port={1} auth_mode={2}".format(g_ip,g_port,g_authm))
+            if int(g_ip) == 0:
+                self.l_error("start","The IP address (GV2) was set to zero?  That's not good, you will need to run discover again")
+            if int(g_port) == 0:
+                self.l_error("start","The port (GV3) was set to zero?  That's not good, you will need to run discover again")
+            self.ip        = long2ip(int(g_ip))
+            self.port      = g_port
+            self.auth_mode = int(g_authm)            
+            self.l_info("start","ip={0} port={1} auth_mode={2}".format(self.ip,self.port,self.auth_mode))
             # This will force query to get it
+            self.sys_ver      = 0
             self.full_sys_ver = None
+            # Make sure drivers are up to date.
+            self.update_drivers()
         # Init these in case we can't query.
-        self.status = {}
+        self.cam_status = {}
         self.params = {}
         for param in ('led_mode', 'alarm_motion_armed', 'alarm_mail', 'alarm_motion_sensitivity', 'alarm_motion_compensation', 'alarm_upload_interval'):
             if not param in self.params:
@@ -101,8 +114,7 @@ class FoscamMJPEG(polyinterface.Node):
         #    'http_url':     "http://%s:%s/motion/%s" % (parent.server.server_address[0], parent.server.server_address[1], self.motion.address)
         #});
         # Query again now that we have set paramaters
-        self.query();
-
+        #self.query();
 
     def query(self):
         """
@@ -115,8 +127,6 @@ class FoscamMJPEG(polyinterface.Node):
         self.get_params();
         # Get current camera status.
         self.get_status();
-        # Set GV4 Responding
-        self.setDriver('GV4', self.connected)
         if self.params:
             self.setDriver('GV5', self.params['led_mode'])
             self.setDriver('GV6', self.params['alarm_motion_armed'])
@@ -135,10 +145,19 @@ class FoscamMJPEG(polyinterface.Node):
 
     def longPoll(self):
         self.l_info("long_poll","...")
-        # get_status handles properly setting self.connected and the driver
+        # get_status handles properly setting self.st and the driver
         # so just call it.
-        self._get_status()
+        self.get_status()
     
+    def set_st(self,value,force=False):
+        if not force and self.st == value:
+            return True
+        self.st = value
+        if value:
+            self.setDriver('ST', 1)
+        else:
+            self.setDriver('ST', 0)
+
     def parse_sys_ver(self,sys_ver):
         """ 
         Given the camera system version as a string, parse into what we 
@@ -190,9 +209,9 @@ class FoscamMJPEG(polyinterface.Node):
         params = self.http_get_and_parse("get_params.cgi")
         if not params:
             self.l_error("get_params","Failed")
-            self.connected = 0
+            self.set_st(False)
             return False
-        self.connected = 1
+        self.set_st(True)
         self.params = self.http_get_and_parse("get_params.cgi")
         misc = self.http_get_and_parse("get_misc.cgi")
         self.params['led_mode'] = misc['led_mode']
@@ -226,15 +245,15 @@ class FoscamMJPEG(polyinterface.Node):
         2 = Unknown
         """
         self.get_status()
-        if not self.status or not 'alarm_status' in self.status:
+        if not self.cam_status or not 'alarm_status' in self.cam_status:
             return 2
-        return int(self.status['alarm_status'])
+        return int(self.cam_status['alarm_status'])
 
     def set_motion_status(self,value):
         """
         Called by motion node to set the current motion status.
         """
-        self.status['alarm_status'] = value
+        self.cam_status['alarm_status'] = value
 
     def get_status(self,report=True):
         """ 
@@ -245,14 +264,14 @@ class FoscamMJPEG(polyinterface.Node):
         # Get the status
         status = self.http_get_and_parse("get_status.cgi")
         if status:
-            connected = 1
-            self.status = status
+            connected = True
+            self.cam_status = status
             # Update sys_ver if it's different
-            if self.full_sys_ver != str(self.status['sys_ver']):
-                self.l_debug("get_status",self.status)
-                self.l_info("get_status","New sys_ver %s != %s" % (self.full_sys_ver,str(self.status['sys_ver'])))
-                self.full_sys_ver = str(self.status['sys_ver'])
-                new_ver = self.parse_sys_ver(self.status['sys_ver'])
+            if self.full_sys_ver != str(self.cam_status['sys_ver']):
+                self.l_debug("get_status",self.cam_status)
+                self.l_info("get_status","New sys_ver %s != %s" % (self.full_sys_ver,str(self.cam_status['sys_ver'])))
+                self.full_sys_ver = str(self.cam_status['sys_ver'])
+                new_ver = self.parse_sys_ver(self.cam_status['sys_ver'])
                 if new_ver is not None:
                     self.sys_ver = new_ver
                     self.setDriver('GV11', self.sys_ver)
@@ -262,14 +281,12 @@ class FoscamMJPEG(polyinterface.Node):
             if hasattr(self,'motion'):
                 self.motion.motion(2)
             else:
-                self.status['alarm_status'] = 2
-            connected = 0
-        if connected != self.connected:
-            self.connected = connected
-            self.setDriver('GV4', self.connected)
+                self.cam_status['alarm_status'] = 2
+            connected = False
+        self.set_st(connected)
 
     def set_alarm_param(self, driver=None, param=None, command=None):
-        value = int(command.get("value"))
+        value = command.get("value")
         if value is None:
             self.l_error("set_alarm_param not passed a value: %s" % (value) )
             return False
@@ -384,9 +401,9 @@ class FoscamMJPEG(polyinterface.Node):
         {'driver': 'GV1',  'value': 0,  'uom': 56}, # Major version of this code.
         {'driver': 'GV2',  'value': 0,  'uom': 56}, # IP Address
         {'driver': 'GV3',  'value': 0,  'uom': 56}, # Port
-        {'driver': 'GV4',  'value': 1,  'uom': 2},  # Responding
+        {'driver': 'GV4',  'value': 0,  'uom': 2},  # No longer used.
         {'driver': 'GV5',  'value': 0,  'uom': 25}, # Network LED Mode
-        {'driver': 'GV6',  'value': 5,  'uom': 2},  # Alarm Motion Armed
+        {'driver': 'GV6',  'value': 0,  'uom': 2},  # Alarm Motion Armed
         {'driver': 'GV7',  'value': 0,  'uom': 2},  # Alarm Send Mail
         {'driver': 'GV8',  'value': 0,  'uom': 25}, # Motion Sensitivity
         {'driver': 'GV9',  'value': 0,  'uom': 2},  # Motion Compensation

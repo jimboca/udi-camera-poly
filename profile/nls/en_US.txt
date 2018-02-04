@@ -44,10 +44,11 @@ ND-FoscamHD2-ICON = Input
 ND-FCAM1-ICON = Input
 
 # Camera Controls
+ST-CAM-ST-NAME = Responding
 ST-CAM-GV1-NAME = Polyglot Node Version Major
 ST-CAM-GV2-NAME = IP Address
 ST-CAM-GV3-NAME = Port
-ST-CAM-GV4-NAME = Responding
+
 ST-CAM-GV5-NAME = Network LED Mode
 ST-CAM-GV6-NAME = Alarm Motion Armed
 ST-CAM-GV7-NAME = Alarm Send Mail
@@ -80,10 +81,11 @@ CMD-CAM-SET_UPINT-NAME = Set Upload Interval
 #CMDP-CAM-
 
 # Camera Controls
+ST-FOSHD2-ST-NAME = Responding
 ST-FOSHD2-GV1-NAME = Polyglot Node Version Major
 ST-FOSHD2-GV2-NAME = IP Address
 ST-FOSHD2-GV3-NAME = Port
-ST-FOSHD2-GV4-NAME = Responding
+ST-FOSHD2-GV4-NAME = Motion Record
 ST-FOSHD2-GV5-NAME = IR LED Mode
 ST-FOSHD2-GV6-NAME = Motion Detect Enable
 ST-FOSHD2-GV7-NAME = Motion Send Mail
@@ -94,8 +96,7 @@ ST-FOSHD2-GV11-NAME = Camera System Version
 ST-FOSHD2-GV12-NAME = Polyglot Node Version Minor
 ST-FOSHD2-GV13-NAME = Motion Snapshot Interval
 ST-FOSHD2-GV14-NAME = Motion Snap Picture
-ST-FOSHD2-GV15-NAME = Motion Record
-ST-FOSHD2-GV16-NAME = Motion Ring
+ST-FOSHD2-GV0-NAME = Motion Ring
 
 CMD-ST-NAME = Query
 CMD-FOSHD2-REBOOT-NAME = Reboot
@@ -222,10 +223,11 @@ ST-CAMNM-ST-NAME = Motion
 #CMDP-CAMNM-ST-NAME = Motion
 
 # Camera Controls
+ST-CAM-ST-NAME = Responding
 ST-CAM-GV1-NAME = Polyglot Node Version Major
 ST-CAM-GV2-NAME = IP Address
 ST-CAM-GV3-NAME = Port
-ST-CAM-GV4-NAME = Responding
+
 ST-CAM-GV5-NAME = Network LED Mode
 ST-CAM-GV6-NAME = Alarm Motion Armed
 ST-CAM-GV7-NAME = Alarm Send Mail
@@ -244,10 +246,11 @@ ND-Amcrest1-ICON = Input
 ND-Amcrest1-ICON = Input
 
 # Camera Controls
+ST-AMC1-ST-NAME = Responding
 ST-AMC1-GV1-NAME = Camera System Version
 ST-AMC1-GV2-NAME = IP Address
 ST-AMC1-GV3-NAME = Port
-ST-AMC1-GV4-NAME = Responding
+
 ST-AMC1-GV5-NAME = Video Motion Detect
 ST-AMC1-GV6-NAME = VMD Record
 ST-AMC1-GV7-NAME = VMD Send Email

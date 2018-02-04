@@ -48,7 +48,7 @@
 
     <!-- 0-3 IR Mode (MAOUO=Mode Auto Off On -->
     <editor id="I_MAOO">
-        <range uom="25" subset="0-3" nls="MAOO" />
+        <range uom="25" subset="0-2" nls="MAOO" />
     </editor>
 
     <!-- 0-3 IR Mode (MAOUO=Mode Auto Off On Unknown-->
