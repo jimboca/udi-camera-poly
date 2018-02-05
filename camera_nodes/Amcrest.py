@@ -23,18 +23,6 @@ class Amcrest(polyinterface.Node):
             # Only config is passed in for a new node, so we need start to get some info.
             self.init      = True
             self.update_config(user,password,config=config)
-            self.host      = config['host']
-            if 'port' in config:
-                self.port = config['port']
-            else:
-                self.port = 80
-            self.l_info("init","connecting to {0}".format(self.host))
-            self.camera    = AmcrestCamera(self.host, self.port, self.user, self.password).camera
-            self.l_info("init","got {0}".format(self.camera))
-            # Node_Address is last 14 characters of the serial number
-            self.address = self.camera.serial_number.decode('utf-8').split()[0][-14:].lower()
-            # Name is the machine name
-            self.name      = self.camera.machine_name.decode('utf-8').split('=')[-1].rstrip()
         else:
             # Re-adding an existing node, which happens on restart.
             self.init      = False
@@ -44,12 +32,23 @@ class Amcrest(polyinterface.Node):
         super(Amcrest, self).__init__(controller, self.address, self.address, self.name)
 
     # This is called by __init__ and the Controller during a discover
-    def update_config(self,user,password,udp_data=None):
-        self.name      = udp_data['name']
-        self.ip        = udp_data['ip']
-        self.port      = udp_data['port']
-        self.full_sys_ver = str(udp_data['sys'])
-        self.sys_ver   = self.parse_sys_ver(self.full_sys_ver)
+    def update_config(self,user,password,config=None):
+        self.host      = config['host']
+        if 'port' in config:
+            self.port = config['port']
+        else:
+            self.port = 80
+        # Need to connect to camera to get it's info.
+        self.l_info("init","connecting to {0}".format(self.host))
+        #
+        # TODO: What happens in error? try/catch?
+        self.camera    = AmcrestCamera(self.host, self.port, self.user, self.password).camera
+        self.l_info("init","got {0}".format(self.camera))
+        # Node_Address is last 14 characters of the serial number
+        self.address = self.camera.serial_number.decode('utf-8').split()[0][-14:].lower()
+        # Name is the machine name
+        self.name      = self.camera.machine_name.decode('utf-8').split('=')[-1].rstrip()
+        self.ip = get_network_ip(self.host)
 
     def update_drivers(self):
         self.setDriver('GV2',  ip2long(self.ip))
@@ -81,41 +80,224 @@ class Amcrest(polyinterface.Node):
         # Call query to pull in the params before adding the motion node.
         self.query();
 
+        def query(self, **kwargs):
+        """ query the camera """
+        # pylint: disable=unused-argument
+        self.l_info("query","start")
+        self._get_status()
+        if self.st:
+            # Full System Version
+            self.full_sys_ver = self.camera.software_information[0].split('=')[1].decode('utf-8');
+            sys_ver_l = self.full_sys_ver.split('.')
+            # Just the first part as a float
+            self.sys_ver      = myfloat("{0}.{1}".format(sys_ver_l[0],sys_ver_l[1]))
+            self.setDriver('GV1', self.sys_ver)
+            # Initialize network info
+            # Motion
+            self.setDriver('GV5', bool2int(self.camera.is_motion_detector_on()))
+            self._get_motion_params()
+            self.setDriver('GV6', self.record_enable)
+            self.setDriver('GV7', self.mail_enable)
+            self.setDriver('GV8', self.snapshot_enable)
+            self.setDriver('GV9', self.snapshot_times)
+            # All done.
+            self.report_driver()
+        self.l_info("query","done")
+        return True
+
+    def shortPoll(self):
+        """ Nothing to poll?  """
+        #response = os.system("ping -c 1 -w2 " + self.ip + " > /dev/null 2>&1")
+        # Fix the motion params if it failed the last time.
+        #if not self.set_motion_params_st and self.connected == 1:
+        #    self._set_motion_params()
+        #self.l_debug("poll","none")
+        return
+
+    def longPoll(self):
+        self.l_info("long_poll","start")
+        # get_status handles properly setting self.connected and the driver
+        # so just call it.
+        self.get_status()
+        self.l_debug("long_poll","done")
+        return
+    
+    def l_info(self, name, string):
+        self.parent.logger.info("%s:%s:%s: %s" %  (self.node_def_id,self.node_address,name,string))
         
-    drivers = [
+    def l_error(self, name, string):
+        estr = "%s:%s:%s: %s" % (self.node_def_id,self.node_address,name,string)
+        self.parent.logger.error(estr)
+        self.parent.send_error(estr)
+    
+    def l_warning(self, name, string):
+        self.parent.logger.warning("%s:%s:%s: %s" % (self.node_def_id,self.node_address,name,string))
+        
+    def l_debug(self, name, string):
+        self.parent.logger.debug("%s:%s:%s: %s" % (self.node_def_id,self.node_address,name,string))
+
+    # **********************************************************************
+    #
+    # Functions to set drivers
+    #
+
+    def set_st(self,value,force=False):
+        if not force and self.st == value:
+            return value
+        self.st = value
+        if value:
+            self.setDriver('ST', 1)
+        else:
+            self.setDriver('ST', 0)
+        return value
+
+    # **********************************************************************
+    #
+    # Functions to grab current state of camera.
+    #
+    
+    def get_status(self):
+        """
+        Simple check if the camera is responding.
+        """
+        self.l_info("_get_status","%s:%s" % (self.host,self.port))
+        # Get the led_mode since that is the simplest return status
+        rc = self.camera.machine_name
+        self.parent.logger.info("_get_status: {0}".format(rc))
+        if rc == 0:
+            connected = False
+            self.l_error("get_status"," Failed to get_status: {0}".format(rc))
+        else:
+            connected = True
+        return self.set_st(connected)
+        
+    def get_motion_params(self):
+        self.l_info("get_motion_params","start")
+        self.mail_enable     = 0
+        self.record_enable   = 0
+        self.snapshot_enable = 0
+        self.snapshot_times  = 0
+        #
+        # Grab all motion detect params in one call
+        #
+        ret = self.camera.motion_detection
+        for s in ret.split():
+            if '=' in s:
+                a = s.split('=')
+                name  = a[0]
+                value = a[1]
+                if '.MailEnable' in name:
+                    self.l_info("get_motion_params","name='{0}' value={1}".format(name,value))
+                    self.mail_enable = str2int(value)
+                elif '.RecordEnable' in name:
+                    self.l_info("get_motion_params","name='{0}' value={1}".format(name,value))
+                    self.record_enable = str2int(value)
+                elif '.SnapshotEnable' in name:
+                    self.l_info("get_motion_params","name='{0}' value={1}".format(name,value))
+                    self.snapshot_enable = str2int(value)
+                elif '.SnapshotTimes' in name:
+                    self.l_info("get_motion_params","name='{0}' value={1}".format(name,value))
+                    self.snapshot_times = int(value)
+        self.l_info("get_motion_params","done")
+        return
+
+    # **********************************************************************
+    #
+    # Functions to set state of camera.
+    #
+    def set_vmd_enable(self, driver=None, **kwargs):
+        """
+        Video Motion Detect
+        """
+        value = kwargs.get("value")
+        if value is None:
+            self.l_error("set_vmd_enable","_set_vmd_enable not passed a value: %s" % (value))
+            return False
+        # TODO: Should use the _driver specified function instead of int.
+        self.l_info("set_vmd_enable","_set_vmd_enable %s" % (value))
+        self.camera.motion_detection = int2str(value)
+        self.l_info("set_vmd_enable","is_motion_detector_on: {0}".format(self.camera.is_motion_detector_on()))
+        self.setDriver(driver, bool2int(self.camera.is_motion_detector_on()))
+        return True
+
+    def set_motion_param(self, driver=None, param=None, convert=None, **kwargs):
+        value = kwargs.get("value")
+        if value is None:
+            self.l_error("set_motion_param","not passed a value: %s" % (value) )
+            return False
+        if convert is not None:
+            if convert == "int2str":
+                sval = int2str(value)
+            elif convert == "int":
+                sval = int(value)
+            else:
+                self.l_info("set_motion_param","unknown convert={0}".format(convert))
+        command = 'configManager.cgi?action=setConfig&MotionDetect[0].EventHandler.{0}={1}'.format(param,sval)
+        self.l_info("set_motion_param","comand={0}".format(command))
+        rc = self.camera.command(command)
+        self.l_info("set_motion_param","return={0}".format(rc.content.decode('utf-8')))
+        if "ok" in rc.content.decode('utf-8').lower():
+            self.setDriver(driver, int(value))
+            return True
+        self.parent.send_error("set_motion_param failed to set {0}={1} return={2}".format(param,value,rc))
+        return False
+
+    def cmd_set_vmd_enable(self,command):
+        value = command.get("value")
+        return self.set_vmd_enable(driver="GV5", value=value)
+        
+    def cmd_set_vmd_record(self,command):
+        value = command.get("value")
+        self.set_motion_param(driver="GV6", param='MailEnable', convert="int2str", value=value)
+
+    def cmd_set_vmd_email(self,command):
+        value = command.get("value")
+        self.set_motion_param(driver="GV7", param='RecordEnable', convert="int2str", value=value)
+
+    def cmd_set_vmd_snapshot(self,command):
+        value = command.get("value")
+        self.set_motion_param(driver="GV8", param='SnapshotEnable', convert="int2str", value=value)
+
+    def cmd_set_vmd_snapshot_count(self,command):
+        value = command.get("value")
+        self.set_motion_param(driver="GV9", param='SnapshotTimes', convert="int", value=value)
+
+    def cmd_goto_preset(self, command):
+        """ Goto the specified preset. """
+        value = command.get("value")
+        if value is None:
+            self.parent.send_error("_goto_preset not passed a value: %s" % (value) )
+            return False
+        rc = self.camera.go_to_preset(action='start', channel=0, preset_point_number=int(value))
+        self.l_info("_goto_preset","return={0}".format(rc))
+        if "ok" in rc.decode('utf-8').lower():
+            return True
+        self.parent.send_error("_goto_preset failed to set {0} message={1}".format(int(value),rc))
+        return True
+
+    _drivers = {
         {'driver': 'ST',   'value': 0,  'uom': 2},  # Responding
-        {'driver': 'GV0',  'value': 0,  'uom': 2},  # Motion Ring
-        {'driver': 'GV1',  'value': 0,  'uom': 56}, # Major version of this code.
+        {'driver': 'GV0',  'value': 0,  'uom': 2},  # -- Not used --
+        {'driver': 'GV1',  'value': 0,  'uom': 56}, # Camera System Version
         {'driver': 'GV2',  'value': 0,  'uom': 56}, # IP Address
         {'driver': 'GV3',  'value': 0,  'uom': 56}, # Port
-        {'driver': 'GV4',  'value': 1,  'uom': 2},  # Motion Record
-        {'driver': 'GV5',  'value': 0,  'uom': 25}, # IR LED Mode
-        {'driver': 'GV6',  'value': 5,  'uom': 2},  # Alarm Motion Armed
-        {'driver': 'GV7',  'value': 0,  'uom': 2},  # Alarm Send Mail
-        {'driver': 'GV8',  'value': 0,  'uom': 25}, # Motion Sensitivity
-        {'driver': 'GV9',  'value': 0,  'uom': 2},  # Motion Compensation (Not used?)
-        {'driver': 'GV10', 'value': 0,  'uom': 25}, # Motion Trigger Interval
-        {'driver': 'GV11', 'value': 0,  'uom': 56}, # Camera System Version
-        {'driver': 'GV12', 'value': 0,  'uom': 56}, # Minor version of this code.
-        {'driver': 'GV13', 'value': 0,  'uom': 25}, # Snap Interval
-        {'driver': 'GV14', 'value': 0,  'uom': 2}   # Motion Picture
-    ]
-    id = 'FoscamHD2'
-    commands = {
-        'QUERY': query,
-        'SET_IRLED':      cmd_set_irled,      # GV5
-        'SET_ALMOA':      cmd_set_almoa,      # GV6
-        'SET_MO_MAIL':    cmd_set_mo_mail,    # GV7
-        'SET_ALMOS':      cmd_set_almos,      # GV8
-        'SET_MO_TRIG':    cmd_set_mo_trig,    # GV10
-        'SET_MO_RING':    cmd_set_mo_ring,    # GV0
-        'SET_MO_PIC':     cmd_set_mo_pic,     # GV14
-        'SET_MO_REC':     cmd_set_mo_rec,     # GV4
-        'SET_MO_PIC_INT': cmd_set_mo_pic_int, # GV13
-        'SET_POS':        cmd_goto_preset,
-        'REBOOT':         cmd_reboot,
+        {'driver': 'GV4',  'value': 0,  'uom': 2},  # -- Not Used --
+        {'driver': 'GV5',  'value': 0,  'uom': 2},  # Video motion detect
+        {'driver': 'GV6',  'value': 0,  'uom': 2},  # 
+        {'driver': 'GV7',  'value': 0,  'uom': 2},  # 
+        {'driver': 'GV8',  'value': 0,  'uom': 2},  # 
+        {'driver': 'GV9',  'value': 0,  'uom': 56},  # 
     }
-    """
-    This is a dictionary of commands. If ISY sends a command to the NodeServer,
-    this tells it which method to call. DON calls setOn, etc.
-    """
+
+    _commands = {
+        'QUERY': query,
+        'SET_VMD_ENABLE':         cmd_set_vmd_enable,
+        'SET_VMD_RECORD':         cmd_set_record,
+        'SET_VMD_EMAIL':          cmd_set_email,
+        'SET_VMD_SNAPSHOT':       cmd_set_snapshot,
+        'SET_VMD_SNAPSHOT_COUNT': cmd_set_snapshot_count,
+        'SET_POS':                cmd_goto_preset,
+        #'REBOOT':    _reboot,
+    }
+    # The nodeDef id of this camers.
+    node_def_id = 'Amcrest'

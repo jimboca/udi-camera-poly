@@ -2,5 +2,5 @@
 
 from .FoscamMJPEG import FoscamMJPEG
 from .FoscamHD2 import FoscamHD2
-#from .Amcrest1 import Amcrest1
+from .Amcrest import Amcrest
 from .CameraController import CameraController
