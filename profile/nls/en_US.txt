@@ -241,9 +241,9 @@ ST-CAM-GV13-NAME = Upload Interval
 #
 # Amcrest
 #
-ND-Amcrest1-NAME = Amcrest Camera Type 1
-ND-Amcrest1-ICON = Input
-ND-Amcrest1-ICON = Input
+ND-Amcrest-NAME = Amcrest Camera
+ND-Amcrest-ICON = Input
+ND-Amcrest-ICON = Input
 
 # Camera Controls
 ST-AMC1-ST-NAME = Responding

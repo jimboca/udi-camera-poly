@@ -1,8 +1,9 @@
 
 import os
 import polyinterface
+from amcrest import AmcrestCamera
 from functools import partial
-from camera_funcs import myint,myfloat,ip2long,long2ip,isBitI,setBit,clearBit
+from camera_funcs import myint,myfloat,ip2long,long2ip,isBitI,setBit,clearBit,bool2int,str2int,str_d,get_valid_node_name,get_network_ip
 import xml.etree.ElementTree as ET
 
 LOGGER = polyinterface.LOGGER
@@ -33,6 +34,7 @@ class Amcrest(polyinterface.Node):
 
     # This is called by __init__ and the Controller during a discover
     def update_config(self,user,password,config=None):
+        self.name      = "NewCamera"
         self.host      = config['host']
         if 'port' in config:
             self.port = config['port']
@@ -45,10 +47,11 @@ class Amcrest(polyinterface.Node):
         self.camera    = AmcrestCamera(self.host, self.port, self.user, self.password).camera
         self.l_info("init","got {0}".format(self.camera))
         # Node_Address is last 14 characters of the serial number
-        self.address = self.camera.serial_number.decode('utf-8').split()[0][-14:].lower()
+        self.address = get_valid_node_name(self.camera.serial_number.split()[0][-14:].lower())
         # Name is the machine name
-        self.name      = self.camera.machine_name.decode('utf-8').split('=')[-1].rstrip()
+        self.name      = get_valid_node_name(self.camera.machine_name.split('=')[-1].rstrip())
         self.ip = get_network_ip(self.host)
+        self.sys_ver      = 0
 
     def update_drivers(self):
         self.setDriver('GV2',  ip2long(self.ip))
@@ -80,14 +83,14 @@ class Amcrest(polyinterface.Node):
         # Call query to pull in the params before adding the motion node.
         self.query();
 
-        def query(self, **kwargs):
+    def query(self):
         """ query the camera """
         # pylint: disable=unused-argument
         self.l_info("query","start")
-        self._get_status()
+        self.get_status()
         if self.st:
             # Full System Version
-            self.full_sys_ver = self.camera.software_information[0].split('=')[1].decode('utf-8');
+            self.full_sys_ver = str_d(self.camera.software_information[0].split('=')[1]);
             sys_ver_l = self.full_sys_ver.split('.')
             # Just the first part as a float
             self.sys_ver      = myfloat("{0}.{1}".format(sys_ver_l[0],sys_ver_l[1]))
@@ -95,13 +98,13 @@ class Amcrest(polyinterface.Node):
             # Initialize network info
             # Motion
             self.setDriver('GV5', bool2int(self.camera.is_motion_detector_on()))
-            self._get_motion_params()
+            self.get_motion_params()
             self.setDriver('GV6', self.record_enable)
             self.setDriver('GV7', self.mail_enable)
             self.setDriver('GV8', self.snapshot_enable)
             self.setDriver('GV9', self.snapshot_times)
             # All done.
-            self.report_driver()
+            self.reportDrivers()
         self.l_info("query","done")
         return True
 
@@ -123,18 +126,16 @@ class Amcrest(polyinterface.Node):
         return
     
     def l_info(self, name, string):
-        self.parent.logger.info("%s:%s:%s: %s" %  (self.node_def_id,self.node_address,name,string))
+        LOGGER.info("%s:%s:%s: %s" %  (self.id,self.name,name,string))
         
     def l_error(self, name, string):
-        estr = "%s:%s:%s: %s" % (self.node_def_id,self.node_address,name,string)
-        self.parent.logger.error(estr)
-        self.parent.send_error(estr)
-    
+        LOGGER.error("%s:%s:%s: %s" % (self.id,self.name,name,string))
+        
     def l_warning(self, name, string):
-        self.parent.logger.warning("%s:%s:%s: %s" % (self.node_def_id,self.node_address,name,string))
+        LOGGER.warning("%s:%s:%s: %s" % (self.id,self.name,name,string))
         
     def l_debug(self, name, string):
-        self.parent.logger.debug("%s:%s:%s: %s" % (self.node_def_id,self.node_address,name,string))
+        LOGGER.debug("%s:%s:%s: %s" % (self.id,self.name,name,string))
 
     # **********************************************************************
     #
@@ -160,10 +161,10 @@ class Amcrest(polyinterface.Node):
         """
         Simple check if the camera is responding.
         """
-        self.l_info("_get_status","%s:%s" % (self.host,self.port))
+        self.l_info("get_status","%s:%s" % (self.host,self.port))
         # Get the led_mode since that is the simplest return status
         rc = self.camera.machine_name
-        self.parent.logger.info("_get_status: {0}".format(rc))
+        self.l_info("get_status","rc={0}".format(rc))
         if rc == 0:
             connected = False
             self.l_error("get_status"," Failed to get_status: {0}".format(rc))
@@ -235,8 +236,9 @@ class Amcrest(polyinterface.Node):
         command = 'configManager.cgi?action=setConfig&MotionDetect[0].EventHandler.{0}={1}'.format(param,sval)
         self.l_info("set_motion_param","comand={0}".format(command))
         rc = self.camera.command(command)
-        self.l_info("set_motion_param","return={0}".format(rc.content.decode('utf-8')))
-        if "ok" in rc.content.decode('utf-8').lower():
+        rc_d = str_d(rc.content)
+        self.l_info("set_motion_param","return={0}".format(rc_d))
+        if "ok" in rc_d.lower():
             self.setDriver(driver, int(value))
             return True
         self.parent.send_error("set_motion_param failed to set {0}={1} return={2}".format(param,value,rc))
@@ -270,12 +272,12 @@ class Amcrest(polyinterface.Node):
             return False
         rc = self.camera.go_to_preset(action='start', channel=0, preset_point_number=int(value))
         self.l_info("_goto_preset","return={0}".format(rc))
-        if "ok" in rc.decode('utf-8').lower():
+        if "ok" in str_d(rc).lower():
             return True
         self.parent.send_error("_goto_preset failed to set {0} message={1}".format(int(value),rc))
         return True
 
-    _drivers = {
+    drivers = [
         {'driver': 'ST',   'value': 0,  'uom': 2},  # Responding
         {'driver': 'GV0',  'value': 0,  'uom': 2},  # -- Not used --
         {'driver': 'GV1',  'value': 0,  'uom': 56}, # Camera System Version
@@ -286,18 +288,17 @@ class Amcrest(polyinterface.Node):
         {'driver': 'GV6',  'value': 0,  'uom': 2},  # 
         {'driver': 'GV7',  'value': 0,  'uom': 2},  # 
         {'driver': 'GV8',  'value': 0,  'uom': 2},  # 
-        {'driver': 'GV9',  'value': 0,  'uom': 56},  # 
-    }
-
-    _commands = {
+        {'driver': 'GV9',  'value': 0,  'uom': 56}  # 
+    ]
+    commands = {
         'QUERY': query,
         'SET_VMD_ENABLE':         cmd_set_vmd_enable,
-        'SET_VMD_RECORD':         cmd_set_record,
-        'SET_VMD_EMAIL':          cmd_set_email,
-        'SET_VMD_SNAPSHOT':       cmd_set_snapshot,
-        'SET_VMD_SNAPSHOT_COUNT': cmd_set_snapshot_count,
+        'SET_VMD_RECORD':         cmd_set_vmd_record,
+        'SET_VMD_EMAIL':          cmd_set_vmd_email,
+        'SET_VMD_SNAPSHOT':       cmd_set_vmd_snapshot,
+        'SET_VMD_SNAPSHOT_COUNT': cmd_set_vmd_snapshot_count,
         'SET_POS':                cmd_goto_preset,
         #'REBOOT':    _reboot,
     }
     # The nodeDef id of this camers.
-    node_def_id = 'Amcrest'
+    id = 'Amcrest'

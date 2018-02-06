@@ -65,13 +65,7 @@ def str2bool(value):
          True values: y, yes, true, t, on, 1
          False values: n, no, false, off, 0
     """
-    try:
-        if isinstance(value, (str, unicode)):
-            return bool(util.strtobool(value))
-    except NameError:  # python 3
-        if isinstance(value, str):
-            return bool(util.strtobool(value))
-    return bool(value)
+    return value in ['y', 'yes', 'true', 't', '1']
 
 def bool2int(value):
     if value:
@@ -88,13 +82,16 @@ def int2str(value):
 def str2int(value):
     return bool2int(str2bool(value))
 
-# Removes invalid charaters for ISY Node description
-def get_valid_node_name(name):
+def str_d(value):
     # Only allow utf-8 characters
     #  https://stackoverflow.com/questions/26541968/delete-every-non-utf-8-symbols-froms-string
-    name = bytes(name, 'utf-8').decode('utf-8','ignore')
+    return bytes(value, 'utf-8').decode('utf-8','ignore')
+
+# Removes invalid charaters for ISY Node description
+def get_valid_node_name(name):
+
     # Remove <>`~!@#$%^&*(){}[]?/\;:"'` characters from name
-    return re.sub(r"[<>`~!@#$%^&*(){}[\]?/\\;:\"']+", "", name)
+    return re.sub(r"[<>`~!@#$%^&*(){}[\]?/\\;:\"']+", "", str_d(name))
 
 def get_server_data(logger):
     # Read the SERVER info from the json.

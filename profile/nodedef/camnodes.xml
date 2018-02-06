@@ -169,7 +169,7 @@
 
   <!-- === Amcrest Camera ============================================================  -->
 
-  <nodeDef id="Amcrest1" nodeType="139" nls="AMC1">
+  <nodeDef id="Amcrest" nodeType="139" nls="AMC1">
     <sts>
       <st id="ST" editor="BOOL" />      <!-- Responding -->
       <st id="GV1" editor="FLOAT" />     <!-- Camera System Version -->

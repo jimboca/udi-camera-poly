@@ -496,7 +496,3 @@ class FoscamHD2(polyinterface.Node):
         'SET_POS':        cmd_goto_preset,
         'REBOOT':         cmd_reboot,
     }
-    """
-    This is a dictionary of commands. If ISY sends a command to the NodeServer,
-    this tells it which method to call. DON calls setOn, etc.
-    """

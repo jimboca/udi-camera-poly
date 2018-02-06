@@ -179,7 +179,7 @@ class CameraController(polyinterface.Controller):
             self.password = default_password
 
         # Make sure they are in the params
-        self.addCustomParam({'password': self.password, 'user': self.user, 'cam_someaddress': '{ "type": "Amcrest", "host": "host_or_IP", "port": "port_number" }'})
+        self.addCustomParam({'password': self.password, 'user': self.user, 'cam_example': '{ "type": "Amcrest", "host": "host_or_IP", "port": "port_number" }'})
 
         self.removeNoticesAll()
         if self.user == default_user or self.password == default_password:
@@ -213,42 +213,33 @@ class CameraController(polyinterface.Controller):
         """
         Add cameras defined in customParams
         """
-        # Add cameras from our config
-        #self.parent.logger.debug("CameraServer:add_config_cams: cameras=%s" % (config['cameras']))
-        #for a_config in config['cameras']:
-        #    if a_config['type'] == "Amcrest1":
-        #        self.parent.logger.debug("CameraServer:add_config_cams: type=Amcrest1")
-        #        Amcrest1(self.parent, True,
-        #                 self.parent.cam_config['user'], self.parent.cam_config['password'],
-        #                 config=a_config) # manifest=data
-        #    else:
-        #        self.parent.logger.error("Unknown Camera type '%s'" % (a_config['type']))
-        #for param in self.polyConfig['customParams']:
-        #    # Look for customParam starting with hub_
-        #    match = re.match( "hub_(.*)", param, re.I)
-        #    if match is not None:
-        #        # The hub address is everything following the hub_
-        #        address = match.group(1)
-        #        self.l_info('discover','got param {0} address={1}'.format(param,address))
-        #        # Get the customParam value which is json code
-        #        #  { "name": "HarmonyHub FamilyRoom", "host": "192.168.1.86" }
-        #        cfg = self.polyConfig['customParams'][param]
-        #        try:
-        #            cfgd = json.loads(cfg)
-        #        except:
-        #            err = sys.exc_info()[0]
-        #            self.l_error('discover','failed to parse cfg={0} Error: {1}'.format(cfg,err))
-        #        # Check that name and host are defined.
-        #        addit = True
-        #        if not 'name' in cfgd:
-        #            self.l_error('discover','No name in customParam {0} value={1}'.format(param,cfg))
-        #            addit = False
-        #        if not 'host' in cfgd:
-        #            self.l_error('discover','No host in customParam {0} value={1}'.format(param,cfg))
-        #            addit = False
-        #        if addit:
-        #            self.hubs.append({'address': address, 'name': get_valid_node_name(cfgd['name']), 'host': cfgd['host'], 'port': 5222})
-        pass
+        for param in self.polyConfig['customParams']:
+            # Look for customParam starting with cam_
+            match = re.match( "cam_(.*)", param, re.I)
+            if match is not None and match.group(1) != "example":
+                # The hub address can be everything following the cam_
+                address = match.group(1)
+                self.l_info('add_config_cams','got param {0} {1}'.format(param,address))
+                # Get the customParam value which is json code
+                #  { "type":"Amcrest", "host": "192.168.1.86", "port": "80" }
+                cfg = self.polyConfig['customParams'][param]
+                try:
+                    cfgd = json.loads(cfg)
+                except:
+                    err = sys.exc_info()[0]
+                    self.l_error('add_config_cams','failed to parse cfg={0} Error: {1}'.format(cfg,err))
+                # Check host and type are defined.
+                addit = True
+                if not 'host' in cfgd:
+                    self.l_error('add_config_cams','No host in customParam {0} value={1}'.format(param,cfg))
+                    addit = False
+                if not 'type' in cfgd:
+                    self.l_error('add_config_cams','No type in customParam {0} value={1}'.format(param,cfg))
+                    addit = False
+                if addit:
+                    if cfgd['type'] == "Amcrest":
+                        self.addNode(Amcrest(self, self.user, self.password, config=cfgd))
+                    self.incr_num_cams()
         
     def discover_foscam(self):
         self.l_info("discover_foscam"," Polling for Foscam cameras %s" % (self.foscam_polling))
