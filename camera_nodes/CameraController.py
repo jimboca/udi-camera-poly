@@ -92,6 +92,9 @@ class CameraController(polyinterface.Controller):
         self.load_params()
         self.add_all_cams()
 
+        self.logger = LOGGER
+        self.rest_server = CameraRestServer(self)
+
     def shortPoll(self):
         """
         Optional.
@@ -268,6 +271,20 @@ class CameraController(polyinterface.Controller):
                     self.l_error("discover_foscam","Unknown type %s for Foscam Camera %s" % (cam['type'],cam['name']))
             self.l_info("discover_foscam","Done")
         
+    def on_exit(self, **kwargs):
+        self.server.socket.close()
+        return True
+
+    def motion(self,address,value):
+        """ Poll Camera's  """
+        self.l_info("motion","%s '%s'" % (address, value) )
+        lnode = self.get_node(address)
+        if lnode:
+            return lnode.motion(value)
+        else:
+            self.l_error("motion","No node for motion on address %s" % (address));
+        return False
+
     def http_get(self,ip,port,user,password,path,payload,auth_mode=0):
         url = "http://{}:{}/{}".format(ip,port,path)
         

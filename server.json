@@ -11,11 +11,19 @@
     "credits": [
         {
             "title": "udi-camera-poly: a NodeServer for My Integration",
-            "author": "Your Name Here",
+            "author": "JimBoCA",
             "version": "2.0.0",
             "date": "Janurary 28, 2017",
-            "source": "https://github.com/Einstein42/udi-camera-poly",
-            "license": "https://raw.githubusercontent.com/Einstein42/udi-poly-template-python/master/LICENSE"
+            "source": "https://github.com/jimboca/udi-camera-poly",
+            "license": "https://raw.githubusercontent.com/jimboca/udi-camera-poly/master/LICENSE"
+        },
+        {
+            "title": "python-amcrest: Python Amcrest Library",
+            "author": "tchellomello",
+            "version": "1.2.1",
+            "date": ",
+            "source": "https://github.com/tchellomello/python-amcrest",
+            "license": "None"
         }
     ]
 }
