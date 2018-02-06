@@ -1,34 +1,35 @@
 
-import requests, threading, SocketServer, re, socket
+import requests, threading, socketserver, re, socket
 from http.client import BadStatusLine  # Python 3.x
 
-
-class EchoRequestHandler(SocketServer.BaseRequestHandler):
+class EchoRequestHandler(socketserver.BaseRequestHandler):
     
-    def handle(self,parent):
-        self.parent = parent
+    def handle(self):
         try:
             # Echo the back to the client
             data = self.request.recv(1024)
             # Don't worry about a status for now, just echo back.
             self.request.sendall(data)
             # Then parse it.
-            parent.handler(data)
-        except:
-            logger.error("request_handler failed")
+            self.parent.handler(data.decode('utf-8','ignore'))
+        except (Exception) as err:
+            self.parent.parent.logger.error("request_handler failed {0}".format(err), exc_info=True)
         return
 
-class CameraRestServer():
+class CameraREST():
 
     def __init__(self,parent):
         self.parent  = parent
 
-    def start():
+    def start(self):
         self.myip    = self.get_network_ip('8.8.8.8')
-        self.address = (myip, 0) # let the kernel give us a port
-        self.server  = SocketServer.TCPServer(self.address, EchoRequestHandler(self))
-        self.parent.logger.info("CameraRestServer: Running on: %s:%s" % server.server_address)
-        self.thread  = threading.Thread(target=server.serve_forever)
+        self.address = (self.myip, 0) # let the kernel give us a port
+        self.parent.logger.debug("CameraREST: address={0}".format(self.address))
+        eh = EchoRequestHandler
+        eh.parent = self
+        self.server  = socketserver.TCPServer(self.address, eh)
+        self.parent.logger.info("CameraRestServer: Running on: %s:%s" % self.server.server_address)
+        self.thread  = threading.Thread(target=self.server.serve_forever)
         #t.setDaemon(True) # don't hang on exit
         self.thread.start()
 
@@ -39,9 +40,11 @@ class CameraRestServer():
         except:
             self.parent.logger.error("CameraRestServer:get_network_ip: Failed to open socket to " + rhost)
             return False
-        return s.getsockname()[0]
+        rt = s.getsockname()[0]
+        s.close()
+        return rt
 
-    def handler(data):
+    def handler(self, data):
         self.parent.logger.debug("CameraRestServer:handler: Got {0}".format(data.strip()))
         match = re.match( r'GET /motion/(.*) ', data, re.I)
         if match:

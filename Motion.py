@@ -55,13 +55,8 @@ class Motion(polyinterface.Node):
         return True
     
     drivers = [
-        {
-            {'driver': 'ST',   'value': 0,  'uom': 25},
-        }
+        {'driver': 'ST',   'value': 0,  'uom': 25}, # ST: Motion on/off
     ]
-    """ Driver Details:
-    ST: Motion on/off
-    """
     commands = {
         'QUERY': query,
     }

@@ -13,7 +13,9 @@ def myfloat(value, prec=4):
 def get_network_ip(rhost):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect((rhost, 0))
-    return s.getsockname()[0]
+    ip = s.getsockname()[0]
+    s.close()
+    return ip
 
 def ip2long(ip):
     """ Convert an IP string to long """

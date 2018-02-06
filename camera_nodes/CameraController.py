@@ -7,6 +7,7 @@ from http.client import BadStatusLine  # Python 3.x
 from foscam_poll import foscam_poll
 from camera_nodes import *
 from camera_funcs import myint,long2ip,get_server_data
+from CameraREST import CameraREST
 
 LOGGER = polyinterface.LOGGER
 
@@ -93,7 +94,8 @@ class CameraController(polyinterface.Controller):
         self.add_all_cams()
 
         self.logger = LOGGER
-        self.rest_server = CameraRestServer(self)
+        self.rest_server = CameraREST(self)
+        self.rest_server.start()
 
     def shortPoll(self):
         """
