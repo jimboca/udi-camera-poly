@@ -147,6 +147,8 @@ class CameraController(polyinterface.Controller):
         Do discovery here. Does not have to be called discovery. Called from example
         controller start method and from DISCOVER command recieved from ISY as an exmaple.
         """
+        if self.load_params():
+            self.l_info("discover","Refuse to continue since load_params failed")
         if self.foscam_polling > 0:
             self.discover_foscam()
         else:
@@ -177,20 +179,23 @@ class CameraController(polyinterface.Controller):
         user = The user name to log into cameras
         password = And the matching password
         """
+        st = True
         default_user = "YourCameraUserName"
         default_password = "YourCameraPassword"
-
+        
         if 'user' in self.polyConfig['customParams']:
             self.user = self.polyConfig['customParams']['user']
         else:
             self.l_error('load_params',"user not defined in customParams, please add it.  Using admin")
             self.user = default_user
+            st = False
 
         if 'password' in self.polyConfig['customParams']:
             self.password = self.polyConfig['customParams']['password']
         else:
             self.l_error('load_params',"password not defined in customParams, please add it.  Using admin")
             self.password = default_password
+            st = False
 
         # Make sure they are in the params
         self.addCustomParam({'password': self.password, 'user': self.user, 'cam_example': '{ "type": "Amcrest", "host": "host_or_IP", "port": "port_number" }'})
