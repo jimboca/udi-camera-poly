@@ -52,7 +52,7 @@ class CameraController(polyinterface.Controller):
         self.address = 'cameractrl'
         # I am my own primary
         self.primary = self.address
-
+        
     def start(self):
         """
         Optional.
@@ -65,6 +65,7 @@ class CameraController(polyinterface.Controller):
         self.l_info('start',"...")
         # TODO; This is only necessary when drivers change?
         #self.addNode(self,update=True)
+        self.discover_thread = None
         self.num_cams       = self.getDriver('GV3')
         self.foscam_polling = self.getDriver('GV4')
         self.debug_mode     = self.getDriver('GV5')
@@ -104,7 +105,15 @@ class CameraController(polyinterface.Controller):
         or longPoll. No need to Super this method the parent version does nothing.
         The timer can be overriden in the server.json.
         """
-        pass
+        if self.discover_thread is not None:
+            if self.discover_thread.isAlive():
+                self.l_debug('shortPoll','discover thread still running...')
+            else:
+                self.l_debug('shortPoll','discover thread is done...')
+                self.discover_thread = None
+        for node in self.nodes:
+            if self.nodes[node].address != self.address and self.nodes[node].do_poll:
+                self.nodes[node].shortPoll()
 
     def longPoll(self):
         """

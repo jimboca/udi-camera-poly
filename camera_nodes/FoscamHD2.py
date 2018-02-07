@@ -3,6 +3,7 @@ import os
 import polyinterface
 from functools import partial
 from camera_funcs import myint,myfloat,ip2long,long2ip,isBitI,setBit,clearBit
+from Motion import Motion
 import xml.etree.ElementTree as ET
 
 LOGGER = polyinterface.LOGGER
@@ -71,6 +72,8 @@ class FoscamHD2(polyinterface.Node):
             self.full_sys_ver = None
             # Make sure drivers are up to date.
             self.update_drivers()
+        # Add my motion node now that the camera is defined.
+        self.motion = self.controller.addNode(Motion(self.controller, self, self))
         # Call query to pull in the params before adding the motion node.
         self.query();
 
@@ -101,6 +104,25 @@ class FoscamHD2(polyinterface.Node):
         # so just call it.
         self.get_status()
     
+    def get_motion_status(self):
+        """
+        Called by motion node to return the current motion status.
+        0 = Off
+        1 = On
+        2 = Unknown
+        """
+        self.get_status()
+        if not self.cam_status or not 'alarm_status' in self.cam_status:
+            return 2
+        return int(self.cam_status['alarm_status'])
+
+    def set_motion_status(self,value):
+        """
+        Called by motion node to set the current motion status.
+        """
+        self.cam_status['alarm_status'] = value
+
+    def get_status(self,report=True):
     def set_st(self,value,force=False):
         if not force and self.st == value:
             return True

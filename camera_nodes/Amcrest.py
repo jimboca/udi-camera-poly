@@ -80,6 +80,8 @@ class Amcrest(polyinterface.Node):
             self.full_sys_ver = None
             # Make sure drivers are up to date.
             self.update_drivers()
+        # Add my motion node now that the camera is defined.
+        self.motion = self.controller.addNode(Motion(self.controller, self, self))
         # Call query to pull in the params before adding the motion node.
         self.query();
 
@@ -113,7 +115,7 @@ class Amcrest(polyinterface.Node):
         #response = os.system("ping -c 1 -w2 " + self.ip + " > /dev/null 2>&1")
         # Fix the motion params if it failed the last time.
         #if not self.set_motion_params_st and self.connected == 1:
-        #    self._set_motion_params()
+        #    self.set_motion_params()
         #self.l_debug("poll","none")
         return
 
