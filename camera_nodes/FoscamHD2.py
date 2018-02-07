@@ -33,6 +33,7 @@ class FoscamHD2(polyinterface.Node):
             return False
         self.cam_status = {}
         self.st  = False
+        self.set_motion_params_st = True
         super(FoscamHD2, self).__init__(controller, self.address, self.address, self.name)
 
     # This is called by __init__ and the Controller during a discover
@@ -96,7 +97,7 @@ class FoscamHD2(polyinterface.Node):
         # Fix the motion params if it failed the last time.
         if not self.set_motion_params_st and self.st:
             self.set_motion_params()
-        return
+        return True
 
     def longPoll(self):
         self.l_info("long_poll","..")
@@ -122,7 +123,6 @@ class FoscamHD2(polyinterface.Node):
         """
         self.cam_status['alarm_status'] = value
 
-    def get_status(self,report=True):
     def set_st(self,value,force=False):
         if not force and self.st == value:
             return True

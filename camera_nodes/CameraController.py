@@ -112,7 +112,7 @@ class CameraController(polyinterface.Controller):
                 self.l_debug('shortPoll','discover thread is done...')
                 self.discover_thread = None
         for node in self.nodes:
-            if self.nodes[node].address != self.address and self.nodes[node].do_poll:
+            if self.nodes[node].address != self.address:
                 self.nodes[node].shortPoll()
 
     def longPoll(self):

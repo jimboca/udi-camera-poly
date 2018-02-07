@@ -9,10 +9,10 @@ class Motion(polyinterface.Node):
         name    = primary.name    + "-Motion"
         address = primary.address + "m";
         self.pnode = primary
+        self.motion_st  = 0
         super(Motion, self).__init__(controller, primary.address, address, name)
 
     def start(self):
-        self.motion_st  = 0
         self.query()
 
     def query(self):
