@@ -1,5 +1,4 @@
 polyinterface>=2.0.0
-python-util
 pyaml==15.8.2
 amcrest==1.2.1
 
