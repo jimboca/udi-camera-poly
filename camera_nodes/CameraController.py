@@ -89,13 +89,13 @@ class CameraController(polyinterface.Controller):
             self.polyConfig['longPoll'] = int(val)
         self.long_poll = val
 
-        self.query();
-        self.load_params()
-        self.add_all_cams()
-
         self.logger = LOGGER
         self.rest_server = CameraREST(self)
         self.rest_server.start()
+
+        self.query();
+        self.load_params()
+        self.add_all_cams()
 
     def shortPoll(self):
         """

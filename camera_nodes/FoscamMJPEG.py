@@ -106,12 +106,13 @@ class FoscamMJPEG(polyinterface.Node):
         # Call query to pull in the params before adding the motion node.
         self.query();
         # Add my motion node now that the camera is defined.
-        self.motion = Motion(parent, self, manifest)
+        self.motion = self.controller.addNode(Motion(self.controller, self, self))
         # Tell the camera to ping the parent server on motion.
+        sa = self.parent.rest_server.server.server_address
         self.set_alarm_params({
             'motion_armed': 1,
             'http':         1,
-            'http_url':     "http://%s:%s/motion/%s" % (parent.server.server_address[0], parent.server.server_address[1], self.motion.address)
+            'http_url':     "http://%s:%s/motion/%s" % (sa[0], sa[1], self.motion.address)
         });
         # Query again now that we have set paramaters
         self.query();
