@@ -21,11 +21,12 @@ This node server is intended to support IP Cameras.
 2. Go to the Polyglot Store in the UI and install.
 3. Add NodeServer in Polyglot Web
 4. Go to the Camera NodeServer Configuration Page
-  * Set user and password for camera, all cameras must use the same.
+   * Set user and password for camera
+   # Currently all cameras must use the same.
 4. Open the admin console (if you already had it open, the close and re-open)
 5. You should get a new node 'Camera Controller', select it
-6. The auto-discover can find Foscam cameras, so if you have some, enable Foscam Polling, 10s is usually enough.
-7. If you have other support cameras, they have to bbe added as Manual entries, in the NodeServer Configuration as detailed in the next sextion.
+6. The auto-discover can find Foscam cameras so enable Foscam Polling if desired, setting to 10s is usually enough.
+7. If you have other support cameras, they have to be added as Manual entries in the NodeServer Configuration as detailed in the next sextion.
 8. Then click the 'Disover' for the Camera Controller node
    * This should find your Cameras add them to the ISY
    * While this is running you can view the nodeserver log in the Polyglot UI to see what it's doing
