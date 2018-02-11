@@ -5,6 +5,7 @@ by Einstein.42 (James Milne) milne.james@gmail.com
 """
 
 import polyinterface
+import sys
 # Harmony Hub Main Controller
 from camera_nodes import CameraController
 
