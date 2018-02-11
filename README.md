@@ -74,7 +74,7 @@ then add port as well.  There is a cam_example in the Polyglot configuration you
    Type must currently be:
    * Amcrest
 
-## Grouping the Camers
+## Grouping the Cameras
 
 Each Camera is added with a Motion node, you can right-click the camera and select Group devices.
 
@@ -94,5 +94,7 @@ Open the Polyglot web page, go to nodeserver store and click "Update" for "Camer
 
 # Release Notes
 
+- 2.1.0 02/10/2018
+   - First release
 - 2.0.0 01/28/2018
    - Not offically released
