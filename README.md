@@ -50,7 +50,7 @@ This node server is intended to support IP Cameras.
 2. Go to the Polyglot Store in the UI and install.
 3. Add Camera NodeServer in Polyglot
 4. Go to the Camera NodeServer Configuration Page
-   * Set user and password for camera
+   * Set user and password for camera it may take a few seconds for the default user and password to show up in the configuration page, just wait and they should show up, then change the defaults for your cameras.
    * Currently all cameras must use the same.
 4. Open the admin console (if you already had it open, then close and re-open)
    * There is usually no need to reboot the ISY
