@@ -1,6 +1,6 @@
 
 # Camera Server
-ND-CameraController-NAME = Camera Server 0.0.0
+ND-CameraController-NAME = Camera Server 2.1.1
 ND-CameraController-ICON = Input
 ST-CAMC-ST-NAME = Polyglot Status
 ST-CAMC-GV1-NAME = Camera NodeServer Version Major
@@ -14,7 +14,7 @@ ST-CAMC-GV7-NAME = Long Poll
 CMD-CAMC-DISCOVER-NAME = Discover
 CMD-CAMC-INSTALL_PROFILE-NAME = Install Profile
 
-CMD-CAMC-SET_FOSCAM_POLLING-NAME = Foscam MJPEG Search
+CMD-CAMC-SET_FOSCAM_POLLING-NAME = Foscam Search
 CFPL-0 = Off
 CFPL-1 = 10s Query
 CFPL-2 = 20s Query
