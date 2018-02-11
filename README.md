@@ -9,25 +9,55 @@ MIT license.
 
 This node server is intended to support IP Cameras.
 
-## Support Cameras
+## Supported Cameras
 
-1. All Known Foscams
-2. All Amcrest cameras supported by [Python Amcrest](https://github.com/tchellomello/python-amcrest)
+### Foscam MJPEG
+
+  This is any Foscam Camera MJPEG camera.  This should be any camera that uses this interface  [Foscam IP Camera CGI](docs/ipcam_cgi_sdk.pdf) which includes the non-HD Smarthome INSTEON cameras that are rebranded Foscam's.
+  * These cameras allow configuring a push notification when motion is sensed so it's seen on the ISY immediatly, but then the Polyglot has to poll the camera every short poll interval to see when motion is off.
+  * All the params are documented in the pdf mentioned above, if you have questions about them, please read that document first.
+  * The 'IR LED' only has a set option, and does not display the status because it seems there is no way to get the status of this from the camera that I can find.  If you know how, please tell me!
+  * The 'Network LED Mode' is the led_mode from the camera which is defined as:
+    * led_mode=0 : LED indicates network connection
+    * led_mode=1 : LED indicates connected network type 
+    * led_mode=2 : LED deactivated except during camera boot
+
+### FoscamHD2 (H.264)
+
+   Any Camera that uses the interface [Foscam IPCamera CGI User Guide](docs/Foscam%20IPCamera%20CGI%20User%20Guide-V1.0.4.pdf)
+   * Presets: To use the Goto preset control you must defined presets named "1", "2", "3", ... on the camera.  I would like to support using the preset names defined on the camera but that would require creating the profile.zip on the fly which is possible, but hasn't been done yet, and not sure it's worth the effort.
+   * These cameras do not allow configuring a push notification when motion is sensed so you must enable motion polling which will poll the camera every short poll interval to check for motion.
+
+
+   Tested with:
+   
+   Camera Model | System Version
+   ------------ | --------------
+   FI9828P V2   | 1.4.1.10
+   FI9826P V2   | 1.5.3.19
+
+### Amcrest
+
+   This uses the [Python Amcrest](https://github.com/tchellomello/python-amcrest) library to control the camera so any that work with that interace should work.
+   Currently there is no discovery for this cameras so you need to add them to the nodeserver configuration
+   * Presets: To use the Goto preset control you must defined presets named "1", "2", "3", ... on the camera.  I would like to support using the preset names defined on the camera but that would require creating the profile.zip on the fly which is possible, but hasn't been done yet, and not sure it's worth the effort.
+   * These cameras do not allow configuring a push notification when motion is sensed so you must enable motion polling which will poll the camera every short poll interval to check for motion.
 
 ## Installation
 
 1. Backup Your ISY in case of problems!
    * Really, do the backup, please
 2. Go to the Polyglot Store in the UI and install.
-3. Add NodeServer in Polyglot Web
+3. Add Camera NodeServer in Polyglot
 4. Go to the Camera NodeServer Configuration Page
    * Set user and password for camera
    * Currently all cameras must use the same.
 4. Open the admin console (if you already had it open, then close and re-open)
+   * There is usually no need to reboot the ISY
 5. You should see a new node 'Camera Controller', select it
 6. The auto-discover can find Foscam cameras so enable Foscam Polling if desired, setting to 10s is usually enough.
-7. If you have other support cameras, they have to be added as Manual entries in the NodeServer Configuration as detailed in the next sextion.
-8. Then click the 'Disover' for the Camera Controller node
+7. If you have other support cameras, they have to be added as Manual entries in the NodeServer Configuration as detailed Manual Camera Entries section.
+8. Then click the 'Discover' for the Camera Controller node
    * This should find your Cameras add them to the ISY
    * While this is running you can view the nodeserver log in the Polyglot UI to see what it's doing
 
@@ -47,7 +77,6 @@ then add port as well.  There is a cam_example in the Polyglot configuration you
 ## Grouping the Camers
 
 Each Camera is added with a Motion node, you can right-click the camera and select Group devices.
-
 
 ## Requirements
 
