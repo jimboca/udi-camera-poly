@@ -3,6 +3,3 @@
 pip3 install -r requirements.txt --user
 
 ./zipprofile.py
-
-
-
