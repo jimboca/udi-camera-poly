@@ -19,7 +19,7 @@ def write_profile_zip(logger):
     zf.close()
 
 if __name__ == "__main__":
-    import logging,json
+    import logging
     logger = logging.getLogger(__name__)
     logging.basicConfig(
         level=10,
