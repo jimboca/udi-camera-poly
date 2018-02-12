@@ -94,6 +94,8 @@ Open the Polyglot web page, go to nodeserver store and click "Update" for "Camer
 
 # Release Notes
 
+- 2.1.2 02/11/2018
+   - Add zip to requirements
 - 2.1.1 02/11/2018
    - Minor profile fixes
 - 2.1.0 02/10/2018

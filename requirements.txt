@@ -1,3 +1,4 @@
+zip
 polyinterface>=2.0.0
 pyaml==15.8.2
 amcrest==1.2.1
