@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-pip3 install -r requirements.txt --user
+sudo apt-get install zip
 
 /usr/bin/make profile.zip
+
+pip3 install -r requirements.txt --user
+
 
