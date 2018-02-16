@@ -94,6 +94,8 @@ Open the Polyglot web page, go to nodeserver store and click "Update" for "Camer
 
 # Release Notes
 
+- 2.1.4 02/16/2018
+   - Really fix Amcrest causing a crash
 - 2.1.3 02/12/2018
    - Fix for Amcrest causing a crash
 - 2.1.2 02/11/2018
