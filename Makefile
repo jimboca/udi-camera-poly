@@ -22,5 +22,6 @@ check:
 # Generate the zip file of profile
 #
 ${ZIP_FILE}: ${ZIP_FILES}
-	cd profile ; f=`echo $? | sed -e 's/profile\///g'` ; /usr/bin/zip -r ../$@ $$f
+	./zipprofile.py
+
 
