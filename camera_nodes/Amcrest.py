@@ -239,12 +239,17 @@ class Amcrest(polyinterface.Node):
         command = 'configManager.cgi?action=setConfig&MotionDetect[0].EventHandler.{0}={1}'.format(param,sval)
         self.l_info("set_motion_param","comand={0}".format(command))
         rc = self.camera.command(command)
-        rc_d = str_d(rc.content)
-        self.l_info("set_motion_param","return={0}".format(rc_d))
-        if "ok" in rc_d.lower():
-            self.setDriver(driver, int(value))
-            return True
-        self.parent.send_error("set_motion_param failed to set {0}={1} return={2}".format(param,value,rc))
+        self.l_debug("set_motion_param","rc={0}".format(rc))
+        # Used to check content here, but status_code seems better.
+        if hasattr(rc,'status_code'):
+            if rc.status_code == 200:
+                self.setDriver(driver, int(value))
+                return True
+            else:
+                self.l_error("set_motion_param","command failed response_code={0}".format(rc.status_code))
+        else:
+            self.l_error("set_motion_param","command response object does not contain a status_code {0}".format(rc))
+        self.l_error("set_motion_param","failed to set {0}={1} return={2}".format(param,value,rc))
         return False
 
     def cmd_set_vmd_enable(self,command):
