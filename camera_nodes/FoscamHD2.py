@@ -20,6 +20,8 @@ class FoscamHD2(polyinterface.Node):
     def __init__(self, controller, user, password, udp_data=None, node_data=None):
         self.user = user
         self.password = password
+        # Use Digest authorization for all HD cameras?
+        self.auth_mode = 0
         if udp_data is not None:
             self.init      = True
             self.address   = udp_data['id'].lower()
@@ -39,8 +41,6 @@ class FoscamHD2(polyinterface.Node):
     # This is called by __init__ and the Controller during a discover
     def update_config(self,user,password,udp_data=None):
         self.name      = udp_data['name']
-        # Use Basic authorization for all HD cameras?
-        self.auth_mode = 0
         self.ip        = udp_data['ip']
         self.port      = udp_data['port']
         self.full_sys_ver = str(udp_data['sys'])
@@ -58,15 +58,13 @@ class FoscamHD2(polyinterface.Node):
             # It's an existing Node, so get the info we need from it.
             g_ip    = self.getDriver('GV2')
             g_port  = self.getDriver('GV3')
-            g_authm = self.getDriver('GV10')
-            self.l_info("start","ip={0} port={1} auth_mode={2}".format(g_ip,g_port,g_authm))
+            self.l_info("start","ip={0} port={1} auth_mode={2}".format(g_ip,g_port,self.auth_mode))
             if int(g_ip) == 0:
                 self.l_error("start","The IP address (GV2) was set to zero?  That's not good, you will need to run discover again")
             if int(g_port) == 0:
                 self.l_error("start","The port (GV3) was set to zero?  That's not good, you will need to run discover again")
             self.ip        = long2ip(int(g_ip))
             self.port      = g_port
-            self.auth_mode = int(g_authm)            
             self.l_info("start","ip={0} port={1} auth_mode={2}".format(self.ip,self.port,self.auth_mode))
             # This will force query to get it
             self.sys_ver      = 0
@@ -276,7 +274,8 @@ class FoscamHD2(polyinterface.Node):
     def get_cam_dev_info(self,report=True):
         rc = self.http_get_and_parse_keys('getDevInfo',"devinfo")
         # Update sys_ver if it's different
-        if self.full_sys_ver != str(self.cam_status['devinfo']['hardwareVer']):
+        self.l_info('get_cam_dev_state','got {0}'.format(rc))
+        if rc != -2 and self.full_sys_ver != str(self.cam_status['devinfo']['hardwareVer']):
             self.l_info("get_cam_dev_info","New sys_ver %s != %s" % (self.full_sys_ver,str(self.cam_status['devinfo']['hardwareVer'])))
             self.full_sys_ver = str(self.cam_status['devinfo']['hardwareVer'])
             self.sys_ver = self.parse_sys_ver(self.cam_status['devinfo']['hardwareVer'])
