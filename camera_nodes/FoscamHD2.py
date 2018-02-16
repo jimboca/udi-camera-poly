@@ -302,7 +302,7 @@ class FoscamHD2(polyinterface.Node):
     def get_status(self):
         self.l_info("get_status","%s:%s" % (self.ip,self.port))
         # Get the led_mode since that is the simplest return status
-        rc = self.get_cam_irled(report=True)
+        rc = self.get_cam_dev_info(report=True)
         self.l_info("get_status","rc=%d" % (rc))
         if rc == 0:
             connected = True
