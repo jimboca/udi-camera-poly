@@ -74,7 +74,7 @@ class Amcrest(polyinterface.Node):
                 self.l_error("start","The port (GV3) was set to zero?  That's not good, you will need to run discover again")
             self.ip        = long2ip(int(g_ip))
             self.port      = g_port
-            self.auth_mode = int(g_authm)            
+            self.auth_mode = int(g_authm)
             self.l_info("start","ip={0} port={1} auth_mode={2}".format(self.ip,self.port,self.auth_mode))
             # This will force query to get it
             self.sys_ver      = 0
@@ -127,16 +127,16 @@ class Amcrest(polyinterface.Node):
         self.get_status()
         self.l_debug("long_poll","done")
         return
-    
+
     def l_info(self, name, string):
         LOGGER.info("%s:%s:%s: %s" %  (self.id,self.name,name,string))
-        
+
     def l_error(self, name, string):
         LOGGER.error("%s:%s:%s: %s" % (self.id,self.name,name,string))
-        
+
     def l_warning(self, name, string):
         LOGGER.warning("%s:%s:%s: %s" % (self.id,self.name,name,string))
-        
+
     def l_debug(self, name, string):
         LOGGER.debug("%s:%s:%s: %s" % (self.id,self.name,name,string))
 
@@ -159,7 +159,7 @@ class Amcrest(polyinterface.Node):
     #
     # Functions to grab current state of camera.
     #
-    
+
     def get_status(self):
         """
         Simple check if the camera is responding.
@@ -174,7 +174,20 @@ class Amcrest(polyinterface.Node):
         else:
             connected = True
         return self.set_st(connected)
-        
+
+    def get_motion_status(self):
+        """
+        Called by motion node to return the current motion status.
+        0 = Off
+        1 = On
+        2 = Unknown
+        """
+        self.l_error('get_motion_status','Not implemented yet')
+        #self.get_status()
+        #if not self.cam_status or not 'alarm_status' in self.cam_status:
+        #    return 2
+        #return int(self.cam_status['alarm_status'])
+
     def get_motion_params(self):
         self.l_info("get_motion_params","start")
         self.mail_enable     = 0
@@ -255,7 +268,7 @@ class Amcrest(polyinterface.Node):
     def cmd_set_vmd_enable(self,command):
         value = command.get("value")
         return self.set_vmd_enable(driver="GV5", value=value)
-        
+
     def cmd_set_vmd_record(self,command):
         value = command.get("value")
         self.set_motion_param(driver="GV6", param='MailEnable', convert="int2str", value=value)
@@ -293,10 +306,10 @@ class Amcrest(polyinterface.Node):
         {'driver': 'GV3',  'value': 0,  'uom': 56}, # Port
         {'driver': 'GV4',  'value': 0,  'uom': 2},  # -- Not Used --
         {'driver': 'GV5',  'value': 0,  'uom': 2},  # Video motion detect
-        {'driver': 'GV6',  'value': 0,  'uom': 2},  # 
-        {'driver': 'GV7',  'value': 0,  'uom': 2},  # 
-        {'driver': 'GV8',  'value': 0,  'uom': 2},  # 
-        {'driver': 'GV9',  'value': 0,  'uom': 56}  # 
+        {'driver': 'GV6',  'value': 0,  'uom': 2},  #
+        {'driver': 'GV7',  'value': 0,  'uom': 2},  #
+        {'driver': 'GV8',  'value': 0,  'uom': 2},  #
+        {'driver': 'GV9',  'value': 0,  'uom': 56}  #
     ]
     commands = {
         'QUERY': query,

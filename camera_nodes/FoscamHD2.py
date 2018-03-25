@@ -23,10 +23,12 @@ class FoscamHD2(polyinterface.Node):
         # Use Digest authorization for all HD cameras?
         self.auth_mode = 0
         if udp_data is not None:
+            # This is when camera is discovered
             self.init      = True
             self.address   = udp_data['id'].lower()
             self.update_config(user,password,udp_data=udp_data)
         elif node_data is not None:
+            # This is on restart when adding nodes back
             self.init      = False
             self.name      = node_data['name']
             self.address   = node_data['address']
@@ -426,21 +428,25 @@ class FoscamHD2(polyinterface.Node):
             self.l_error("set_motion_linkage unknown param '%s'" % (param) )
             return False
         value = int(value)
-        cval = int(self.cam_status['motion_detect']['linkage'])
-        self.l_debug("set_motion_linkage","param=%s value=%s, bit=%d, motion_detect_linkage=%s" % (param,value,linkage_bits[param],cval))
-        if value == 0:
-            cval = clearBit(cval,linkage_bits[param])
+        if 'linkage' in self.cam_status['motion_detect']:
+            cval = int(self.cam_status['motion_detect']['linkage'])
+            self.l_debug("set_motion_linkage","param=%s value=%s, bit=%d, motion_detect_linkage=%s" % (param,value,linkage_bits[param],cval))
+            if value == 0:
+                cval = clearBit(cval,linkage_bits[param])
+            else:
+                cval = setBit(cval,linkage_bits[param])
+            # TODO: Should use the _driver specified function instead of int.
+            self.cam_status['motion_detect']['linkage'] = cval
+            self.l_debug("set_motion_linkage","%d" % (cval))
+            if self.set_motion_params():
+                self.l_debug("set_motion_linkage","setDriver({0},{1})".format(driver, myint(value)))
+                self.setDriver(driver, myint(value))
+                return True
+            self.l_error("set_motion_param","failed to set %s=%s" % ("linkage",cval) )
+            return False
         else:
-            cval = setBit(cval,linkage_bits[param])
-        # TODO: Should use the _driver specified function instead of int.
-        self.cam_status['motion_detect']['linkage'] = cval
-        self.l_debug("set_motion_linkage","%d" % (cval))
-        if self.set_motion_params():
-            self.l_debug("set_motion_linkage","setDriver({0},{1})".format(driver, myint(value)))
-            self.setDriver(driver, myint(value))
-            return True
-        self.l_error("set_motion_param","failed to set %s=%s" % ("linkage",cval) )
-        return False
+            self.l_error("set_motion_param","linkage not found in %s" % ("linkage") )
+            return False
 
     def cmd_reboot(self, command):
         """ Reboot the Camera """

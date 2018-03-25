@@ -225,6 +225,8 @@ class CameraController(polyinterface.Controller):
             elif node['node_def_id'] == "FoscamHD2":
                 self.l_info("add_existing_cams","Adding FoscamHD2 camera: {0} = {1}".format(node['name'],node))
                 self.addNode(FoscamHD2(self, self.user, self.password, node_data=node))
+            elif node['node_def_id'] == 'CamMotion':
+                pass
             else:
                 self.l_error("add_existing_cams","Unknown camera id %s for %s" % (node['node_def_id'],node['name']))
 

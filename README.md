@@ -5,7 +5,7 @@
 
 This is the Camera Poly for the [Universal Devices ISY994i](https://www.universal-devices.com/residential/ISY) [Polyglot interface](http://www.universal-devices.com/developers/polyglot/docs/) with  [Polyglot V2](https://github.com/Einstein42/udi-polyglotv2)
 (c) JimBoCA aka Jim Searle
-MIT license. 
+MIT license.
 
 This node server is intended to support IP Cameras.
 
@@ -19,7 +19,7 @@ This node server is intended to support IP Cameras.
   * The 'IR LED' only has a set option, and does not display the status because it seems there is no way to get the status of this from the camera that I can find.  If you know how, please tell me!
   * The 'Network LED Mode' is the led_mode from the camera which is defined as:
     * led_mode=0 : LED indicates network connection
-    * led_mode=1 : LED indicates connected network type 
+    * led_mode=1 : LED indicates connected network type
     * led_mode=2 : LED deactivated except during camera boot
 
 ### FoscamHD2 (H.264)
@@ -30,7 +30,7 @@ This node server is intended to support IP Cameras.
 
 
    Tested with:
-   
+
    Camera Model | System Version
    ------------ | --------------
    FI9828P V2   | 1.4.1.10
@@ -94,6 +94,10 @@ Open the Polyglot web page, go to nodeserver store and click "Update" for "Camer
 
 # Release Notes
 
+- 2.1.6
+   - Fixes for some FoscamHD2 commands which have been broken since release.
+- 2.1.5
+   - Minor fixes for flakey cameras
 - 2.1.4 02/16/2018
    - Really fix Amcrest causing a crash
 - 2.1.3 02/12/2018

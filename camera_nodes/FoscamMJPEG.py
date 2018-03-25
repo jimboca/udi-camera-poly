@@ -90,7 +90,7 @@ class FoscamMJPEG(polyinterface.Node):
                 self.l_error("start","The port (GV3) was set to zero?  That's not good, you will need to run discover again")
             self.ip        = long2ip(int(g_ip))
             self.port      = g_port
-            self.auth_mode = int(g_authm)            
+            self.auth_mode = int(g_authm)
             self.l_info("start","ip={0} port={1} auth_mode={2}".format(self.ip,self.port,self.auth_mode))
             # This will force query to get it
             self.sys_ver      = 0
@@ -149,7 +149,7 @@ class FoscamMJPEG(polyinterface.Node):
         # get_status handles properly setting self.st and the driver
         # so just call it.
         self.get_status()
-    
+
     def set_st(self,value,force=False):
         if not force and self.st == value:
             return True
@@ -160,8 +160,8 @@ class FoscamMJPEG(polyinterface.Node):
             self.setDriver('ST', 0)
 
     def parse_sys_ver(self,sys_ver):
-        """ 
-        Given the camera system version as a string, parse into what we 
+        """
+        Given the camera system version as a string, parse into what we
         show, which is the last 2 digits
         """
         vnums = sys_ver.split(".")
@@ -173,11 +173,11 @@ class FoscamMJPEG(polyinterface.Node):
         else:
             self.l_waning("parse_sys_ver","Unknown sys_Ver{}".format(sys_ver))
             return None
-        
+
     def get_auth_mode(self,sys_ver):
-        """ 
-        Given the camera system version as a string, figure out the 
-        authorization mode.  Default is 0 (Basic) but if last 2 
+        """
+        Given the camera system version as a string, figure out the
+        authorization mode.  Default is 0 (Basic) but if last 2
         digits of sys_ver are > 2.52 then use 1 (Digest)
         """
         auth_mode = 0
@@ -190,10 +190,10 @@ class FoscamMJPEG(polyinterface.Node):
     def http_get(self, path, payload = {}):
         """ Call http_get on this camera for the specified path and payload """
         return self.parent.http_get(self.ip,self.port,self.user,self.password,path,payload,auth_mode=self.auth_mode)
-        
+
     def http_get_and_parse(self, path, payload = {}):
-        """ 
-        Call http_get and parse the returned Foscam data into a hash.  The data 
+        """
+        Call http_get and parse the returned Foscam data into a hash.  The data
         all looks like:  var id='000C5DDC9D6C';
         """
         data = self.http_get(path,payload)
@@ -204,7 +204,7 @@ class FoscamMJPEG(polyinterface.Node):
             param = item.replace('var ','').replace("'",'').strip(';').split('=')
             ret[param[0]] = param[1]
         return ret
-    
+
     def get_params(self):
         """ Call get_params and get_misc on the camera and store in params """
         params = self.http_get_and_parse("get_params.cgi")
@@ -218,21 +218,21 @@ class FoscamMJPEG(polyinterface.Node):
         self.params['led_mode'] = misc['led_mode']
 
     def set_alarm_params(self,params):
-        """ 
+        """
         Set the sepecified alarm params on the camera
         """
         self.l_info("set_alarm_params","%s" % (params))
         return self.http_get("set_alarm.cgi",params)
 
     def set_misc_params(self,params):
-        """ 
+        """
         Set the sepecified misc params on the camera
         """
         self.l_info("set_misc_params"," %s" % (params))
         return self.http_get("set_misc.cgi",params)
 
     def decoder_control(self,params):
-        """ 
+        """
         Pass in decoder command
         """
         self.l_info("set_decoder_control","%s" % (params))
@@ -257,7 +257,7 @@ class FoscamMJPEG(polyinterface.Node):
         self.cam_status['alarm_status'] = value
 
     def get_status(self,report=True):
-        """ 
+        """
         Call get_status on the camera and store in status
         """
         # Can't spit out the device name cause we might not know it yet.
@@ -286,8 +286,7 @@ class FoscamMJPEG(polyinterface.Node):
             connected = False
         self.set_st(connected)
 
-    def set_alarm_param(self, driver=None, param=None, command=None):
-        value = command.get("value")
+    def set_alarm_param(self, driver=None, param=None, value=None):
         if value is None:
             self.l_error("set_alarm_param not passed a value: %s" % (value) )
             return False
@@ -349,7 +348,7 @@ class FoscamMJPEG(polyinterface.Node):
         return True
 
     def cmd_goto_preset(self, command):
-        """ Goto the specified preset. 
+        """ Goto the specified preset.
               Preset 1 = Command 31
               Preset 2 = Command 33
               Preset 3 = Command 35
@@ -369,13 +368,13 @@ class FoscamMJPEG(polyinterface.Node):
 
     def l_info(self, name, string):
         LOGGER.info("%s:%s:%s: %s" %  (self.id,self.name,name,string))
-        
+
     def l_error(self, name, string):
         LOGGER.error("%s:%s:%s: %s" % (self.id,self.name,name,string))
-        
+
     def l_warning(self, name, string):
         LOGGER.warning("%s:%s:%s: %s" % (self.id,self.name,name,string))
-        
+
     def l_debug(self, name, string):
         LOGGER.debug("%s:%s:%s: %s" % (self.id,self.name,name,string))
 
@@ -383,19 +382,19 @@ class FoscamMJPEG(polyinterface.Node):
         self.set_misc_param(driver="GV5", param='led_mode', value=command.get("value"))
 
     def cmd_set_almoa(self,command):
-        self.set_misc_param(driver="GV6", param='motion_armed', value=command.get("value"))
+        self.set_alarm_param(driver="GV6", param='motion_armed', value=command.get("value"))
 
     def cmd_set_alml(self,command):
-        self.set_misc_param(driver="GV7", param='motion_mail', value=command.get("value"))
+        self.set_alarm_param(driver="GV7", param='mail', value=command.get("value"))
 
     def cmd_set_almos(self,command):
-        self.set_misc_param(driver="GV8", param='motion_sensitivity', value=command.get("value"))
+        self.set_alarm_param(driver="GV8", param='motion_sensitivity', value=command.get("value"))
 
     def cmd_set_almoc(self,command):
-        self.set_misc_param(driver="GV9", param='motion_compensation', value=command.get("value"))
+        self.set_alarm_param(driver="GV9", param='motion_compensation', value=command.get("value"))
 
     def cmd_set_upint(self,command):
-        self.set_misc_param(driver="GV13", param='upload_interval', value=command.get("value"))
+        self.set_alarm_param(driver="GV13", param='upload_interval', value=command.get("value"))
 
     drivers = [
         {'driver': 'ST',   'value': 0,  'uom': 2},
