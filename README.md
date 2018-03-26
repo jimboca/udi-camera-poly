@@ -44,6 +44,7 @@ If you have a camera that is not on this list, please look for this line in your
 ```
 2018-03-25 19:24:21,540 INFO     FoscamHD2:CamOutEntry:get_cam_all: model=50, model_name=FI9828P+V2, hardware_ver=1.4.1.10, firmware_ver=2.11.1.133, amba=False
 ```
+Just search for get_cam_all in your log to find them.
 
 ### Amcrest
 
