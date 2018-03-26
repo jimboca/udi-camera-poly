@@ -24,17 +24,21 @@ This node server is intended to support IP Cameras.
 
 ### FoscamHD2 (H.264)
 
-   Any Camera that uses the interface [Foscam IPCamera CGI User Guide](docs/Foscam%20IPCamera%20CGI%20User%20Guide-V1.0.4.pdf)
+   Any Camera that uses the interface [Foscam IPCamera CGI User Guide](docs/Foscam-IPCamera-CGI-User-Guide-AllPlatforms-2015.11.06)
    * Presets: To use the Goto preset control you must defined presets named "1", "2", "3", ... on the camera.  I would like to support using the preset names defined on the camera but that would require creating the profile.zip on the fly which is possible, but hasn't been done yet, and not sure it's worth the effort.
    * These cameras do not allow configuring a push notification when motion is sensed so you must enable motion polling which will poll the camera every short poll interval to check for motion.
 
 
    Tested with:
 
-   Camera Model | System Version
-   ------------ | --------------
-   FI9828P V2   | 1.4.1.10
-   FI9826P V2   | 1.5.3.19
+   Camera Model | System Firmware Version | Application Firmware Version   | Note
+   ------------ | ----------------------- | ------------------------------ | ----
+   FI9828P V2   | 1.4.1.10                | 2.11.1.133                     |
+   FI9826P V2   | 1.5.3.19                | 2.21.2.27                      |
+   R2 V4        | 1.11.1.10               | 2.71.1.54                      | Amba
+
+   Notes:
+    * Amba means it uses the "Amba S2L" as documented in the pdf above.  If you are not sure if that is needed for your camera enable/disable motion detection and see if the nodeserver log shows <result>-3</result> this may mean we need to update the nodeserver to understand this for your camera.  Currently this is enabled when System Fireware starts with 1.11.  I think the FI9900P Cameras need this enabled but I don't have an example.
 
 ### Amcrest
 
@@ -67,7 +71,7 @@ If the discover does not work, or you prefer to not use it, or you have other su
 you can add customParms in the Polyglot Web UI to tell it about your cameras.
 
 Create a param with the name 'cam_xx' with a value: { "type:" "Amcrest", "host": "192.168.1.86" }
-The _xx is not important, it just needs to be unique for each one.  If your port is not the default
+The underscore xx is not important, it just needs to be unique for each one.  If your port is not the default
 then add port as well.  There is a cam_example in the Polyglot configuration you can copy/paste.
 
 #### Allowed Types:
@@ -94,19 +98,22 @@ Open the Polyglot web page, go to nodeserver store and click "Update" for "Camer
 
 # Release Notes
 
+- 2.1.7
+  - https://github.com/jimboca/udi-camera-poly/issues/1
+  - https://github.com/jimboca/udi-camera-poly/issues/3
 - 2.1.6
-   - Fixes for some FoscamHD2 commands which have been broken since release.
+  - Fixes for some FoscamHD2 commands which have been broken since release.
 - 2.1.5
-   - Minor fixes for flakey cameras
+  - Minor fixes for flakey cameras
 - 2.1.4 02/16/2018
-   - Really fix Amcrest causing a crash
+  - Really fix Amcrest causing a crash
 - 2.1.3 02/12/2018
-   - Fix for Amcrest causing a crash
+  - Fix for Amcrest causing a crash
 - 2.1.2 02/11/2018
-   - Add zip to requirements
+  - Add zip to requirements
 - 2.1.1 02/11/2018
-   - Minor profile fixes
+  - Minor profile fixes
 - 2.1.0 02/10/2018
-   - First release
+  - First release
 - 2.0.0 01/28/2018
-   - Not offically released
+  - Not offically released

@@ -35,6 +35,7 @@ class FoscamHD2(polyinterface.Node):
         else:
             self.l_error("__init__","one of node_data or udp_data must be passed in")
             return False
+        self.amba = False
         self.cam_status = {}
         self.st  = False
         self.set_motion_params_st = True
@@ -46,12 +47,11 @@ class FoscamHD2(polyinterface.Node):
         self.ip        = udp_data['ip']
         self.port      = udp_data['port']
         self.full_sys_ver = str(udp_data['sys'])
-        self.sys_ver   = self.parse_sys_ver(self.full_sys_ver)
 
     def update_drivers(self):
         self.setDriver('GV2',  ip2long(self.ip))
         self.setDriver('GV3',  self.port)
-        self.setDriver('GV11', self.sys_ver)
+        self.setDriver('GV11', self.sys_s_ver)
 
     def start(self):
         if self.init:
@@ -69,7 +69,8 @@ class FoscamHD2(polyinterface.Node):
             self.port      = g_port
             self.l_info("start","ip={0} port={1} auth_mode={2}".format(self.ip,self.port,self.auth_mode))
             # This will force query to get it
-            self.sys_ver      = 0
+            self.sys_s_ver    = 0
+            self.sys_e_ver    = 0
             self.full_sys_ver = None
             # Make sure drivers are up to date.
             self.update_drivers()
@@ -104,7 +105,7 @@ class FoscamHD2(polyinterface.Node):
         # get_status handles properly setting self.st and the driver
         # so just call it.
         self.get_status()
-    
+
     def get_motion_status(self):
         """
         Called by motion node to return the current motion status.
@@ -133,20 +134,28 @@ class FoscamHD2(polyinterface.Node):
             self.setDriver('ST', 0)
 
     def parse_sys_ver(self,sys_ver):
-        """ 
-        Given the camera system version as a string, parse into what we 
+        """
+        Given the camera system version as a string, parse into what we
         show, which is the last 2 digits
         """
-        vnums = sys_ver.split(".")
+        self.full_sys_ver = str(sys_ver)
+        vnums = self.full_sys_ver.split(".")
         if len(vnums) == 4:
             self.l_debug("parse_sys_ver","{0} 0={1} 1={2} 2={3} 3={4}".format(sys_ver,vnums[0],vnums[1],vnums[2],vnums[3]))
-            ver = myfloat("%d.%d" % (int(vnums[2]),int(vnums[3])),2)
-            self.l_debug("parse_sys_ver","ver={}".format(ver))
-            return ver
+            self.sys_s_ver = myfloat("%d.%d" % (int(vnums[0]),int(vnums[1])),2)
+            self.sys_e_ver = myfloat("%d.%d" % (int(vnums[2]),int(vnums[3])),2)
+            self.l_debug("parse_sys_ver","sys_s_ver={} sys_e_ver".format(self.sys_s_ver,self.sys_e_ver))
+            if self.sys_s_ver == 1.11:
+                self.l_info('parse_sys_ver','This IS an Amba Camera')
+                self.amba = True
+            else:
+                self.l_info('parse_sys_ver','This IS an Amba Camera')
+                self.amba = False
         else:
             self.l_waning("parse_sys_ver","Unknown sys_Ver{}".format(sys_ver))
-            return None
-        
+            self.sys_s_ver = None
+            self.sys_e_ver = None
+
 
     def get_motion_status(self):
         """
@@ -183,10 +192,10 @@ class FoscamHD2(polyinterface.Node):
         payload['usr'] = self.user
         payload['pwd'] = self.password
         return self.parent.http_get(self.ip,self.port,self.user,self.password,path,payload,auth_mode=self.auth_mode)
-        
+
     def http_get_and_parse(self, cmd, payload = {}):
-        """ 
-        Call http_get and parse the returned Foscam data into a hash.  The data 
+        """
+        Call http_get and parse the returned Foscam data into a hash.  The data
         all looks like:  var id='000C5DDC9D6C';
         """
         ret  = {}
@@ -267,7 +276,7 @@ class FoscamHD2(polyinterface.Node):
         rc = self.http_get_and_parse_keys('getInfraLedConfig',"irled")
         self.get_irled_state(report)
         return rc
-    
+
     def get_cam_dev_state(self,report=True):
         rc = self.http_get_and_parse_keys('getDevState',"devstate")
         self.get_irled_state(report)
@@ -279,25 +288,31 @@ class FoscamHD2(polyinterface.Node):
         self.l_info('get_cam_dev_state','got {0}'.format(rc))
         if rc != -2 and self.full_sys_ver != str(self.cam_status['devinfo']['hardwareVer']):
             self.l_info("get_cam_dev_info","New sys_ver %s != %s" % (self.full_sys_ver,str(self.cam_status['devinfo']['hardwareVer'])))
-            self.full_sys_ver = str(self.cam_status['devinfo']['hardwareVer'])
-            self.sys_ver = self.parse_sys_ver(self.cam_status['devinfo']['hardwareVer'])
-            self.setDriver('GV11', self.sys_ver)
+            self.parse_sys_ver(self.cam_status['devinfo']['hardwareVer'])
+            self.setDriver('GV11', self.sys_s_ver)
         return rc
 
     def get_cam_motion_detect_config(self,report=True):
         mk = 'motion_detect'
-        st = self.http_get_and_parse_keys('getMotionDetectConfig',mk)
+        command = 'getMotionDetectConfig1' if self.amba else 'getMotionDetectConfig'
+        st = self.http_get_and_parse_keys(command,mk)
         self.l_info("get_cam_motion_detect_config","st=%d" % (st))
         if st == 0:
             self.setDriver('GV6',  int(self.cam_status[mk]['isEnable']))
-            self.setDriver('GV8',  int(self.cam_status[mk]['sensitivity']))
+            if 'sensitivity' in self.cam_status[mk]:
+                self.setDriver('GV8',  int(self.cam_status[mk]['sensitivity']))
+            else:
+                self.l_error('get_cam_motion_detect_config','No sensitivity in {}'.format(self.cam_status[mk]))
             self.setDriver('GV10', int(self.cam_status[mk]['triggerInterval']))
             self.setDriver('GV13', int(self.cam_status[mk]['snapInterval']))
-            sl = int(self.cam_status[mk]['linkage'])
-            self.setDriver('GV7',  isBitI(sl,linkage_bits['send_mail']))
-            self.setDriver('GV14', isBitI(sl,linkage_bits['snap_picture']))
-            self.setDriver('GV4',  isBitI(sl,linkage_bits['record']))
-            self.setDriver('GV0', isBitI(sl,linkage_bits['ring']))
+            if 'linkage' in self.cam_status[mk]:
+                sl = int(self.cam_status[mk]['linkage'])
+                self.setDriver('GV7',  isBitI(sl,linkage_bits['send_mail']))
+                self.setDriver('GV14', isBitI(sl,linkage_bits['snap_picture']))
+                self.setDriver('GV4',  isBitI(sl,linkage_bits['record']))
+                self.setDriver('GV0', isBitI(sl,linkage_bits['ring']))
+            else:
+                self.l_error('get_cam_motion_detect_config','No linkage in {}'.format(self.cam_status[mk]))
         return st
 
     def get_status(self):
@@ -317,9 +332,9 @@ class FoscamHD2(polyinterface.Node):
                 #self.cam_status['alarm_status'] = 2
             connected = False
         self.set_st(connected)
-        
+
     def get_cam_all(self,report=True):
-        """ 
+        """
         Call get_status on the camera and store in status
         """
         self.get_status()
@@ -327,17 +342,17 @@ class FoscamHD2(polyinterface.Node):
             self.get_cam_dev_state(report=False)
             self.get_cam_dev_info(report=False)
             self.get_cam_motion_detect_config(report=False)
-            
+
 
     def l_info(self, name, string):
         LOGGER.info("%s:%s:%s: %s" %  (self.id,self.name,name,string))
-        
+
     def l_error(self, name, string):
         LOGGER.error("%s:%s:%s: %s" % (self.id,self.name,name,string))
-        
+
     def l_warning(self, name, string):
         LOGGER.warning("%s:%s:%s: %s" % (self.id,self.name,name,string))
-        
+
     def l_debug(self, name, string):
         LOGGER.debug("%s:%s:%s: %s" % (self.id,self.name,name,string))
 
@@ -385,9 +400,9 @@ class FoscamHD2(polyinterface.Node):
         else:
             self.l_error("is_conncted","Camera {0}:{1} is not respoding {2}".format(self.ip,self.port,self.st))
             return False
-        
+
     def set_motion_params(self):
-        """ 
+        """
         Set all alarm motion params on the camera.  All need to be passed each time
         because if one is not passed it reverts to the default... dumb foscam api ...
         """
@@ -395,7 +410,10 @@ class FoscamHD2(polyinterface.Node):
             return False
         #self.l_debug("set_motion_params","cam_status={}".format(self.cam_status))
         self.l_info("set_motion_params","...")
-        self.set_motion_params_st = self.http_get("setMotionDetectConfig",self.cam_status['motion_detect'])
+        command = 'setMotionDetectConfig1' if self.amba else 'setMotionDetectConfig'
+        for i in range(0, 7):
+            self.cam_status['motion_detect']['schedule'+str(i)] = 281474976710655
+        self.set_motion_params_st = self.http_get(command,self.cam_status['motion_detect'])
         return self.set_motion_params_st
 
     def set_motion_param(self, driver=None, param=None, value=None):
@@ -445,7 +463,7 @@ class FoscamHD2(polyinterface.Node):
             self.l_error("set_motion_param","failed to set %s=%s" % ("linkage",cval) )
             return False
         else:
-            self.l_error("set_motion_param","linkage not found in %s" % ("linkage") )
+            self.l_error("set_motion_param","linkage not found in {}".format(self.cam_status['motion_detect']))
             return False
 
     def cmd_reboot(self, command):
@@ -468,28 +486,28 @@ class FoscamHD2(polyinterface.Node):
 
     def cmd_set_almoa(self,command):
         self.set_motion_param('GV6','isEnable',command.get("value"))
-        
+
     def cmd_set_mo_mail(self,command):
         self.set_motion_linkage('GV7','send_mail',command.get("value"))
-        
+
     def cmd_set_almos(self,command):
         self.set_motion_param('GV8','sensitivity',command.get("value"))
-        
+
     def cmd_set_mo_trig(self,command):
         self.set_motion_param('GV10','triggerInterval',command.get("value"))
-        
+
     def cmd_set_mo_ring(self,command):
         self.set_motion_linkage('GV0','ring',command.get("value"))
-        
+
     def cmd_set_mo_pic(self,command):
         self.set_motion_linkage('GV14','snap_picture',command.get("value"))
-        
+
     def cmd_set_mo_rec(self,command):
         self.set_motion_linkage('GV4','record',command.get("value"))
-        
+
     def cmd_set_mo_pic_int(self,command):
         self.set_motion_param('GV13','snapInterval',command.get("value"))
-        
+
     drivers = [
         {'driver': 'ST',   'value': 0,  'uom': 2},  # Responding
         {'driver': 'GV0',  'value': 0,  'uom': 2},  # Motion Ring

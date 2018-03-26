@@ -52,7 +52,7 @@ class CameraController(polyinterface.Controller):
         self.address = 'cameractrl'
         # I am my own primary
         self.primary = self.address
-        
+
     def start(self):
         """
         Optional.
@@ -79,7 +79,7 @@ class CameraController(polyinterface.Controller):
         else:
             self.polyConfig['shortPoll'] = int(val)
         self.short_poll = val
-            
+
         # Long Poll
         val = self.getDriver('GV7')
         self.l_debug("start","longPoll={0} GV7={1}".format(self.polyConfig['longPoll'],val))
@@ -182,7 +182,7 @@ class CameraController(polyinterface.Controller):
         st = True
         default_user = "YourCameraUserName"
         default_password = "YourCameraPassword"
-        
+
         if 'user' in self.polyConfig['customParams']:
             self.user = self.polyConfig['customParams']['user']
         else:
@@ -203,7 +203,7 @@ class CameraController(polyinterface.Controller):
         self.removeNoticesAll()
         if self.user == default_user or self.password == default_password:
             self.addNotice("Please set proper camera user and password in Configuration page, and restart this nodeserver")
-            
+
     def add_all_cams(self):
         self.set_num_cams(0)
         self.add_existing_cams()
@@ -261,14 +261,17 @@ class CameraController(polyinterface.Controller):
                     if cfgd['type'] == "Amcrest":
                         self.addNode(Amcrest(self, self.user, self.password, config=cfgd))
                     self.incr_num_cams()
-        
+
     def discover_foscam(self):
-        self.l_info("discover_foscam"," Polling for Foscam cameras %s" % (self.foscam_polling))
+        self.l_info("discover_foscam","Polling for Foscam cameras %s" % (self.foscam_polling))
         cams = foscam_poll(LOGGER)
-        self.l_info("discover_foscam"," Got cameras: " + str(cams))
+        self.l_debug("discover_foscam","Camera Data: " + str(cams))
         for cam in cams:
             cam['id'] = cam['id'].lower()
-            self.l_info("discover_foscam","Checking to add camera: %s %s" % (cam['id'], cam['name']))
+            self.l_info("discover_foscam","Checking to add camera: id=%s name=%s" % (cam['id'], cam['name']))
+            for key, value in cam.items():
+                if key != 'name' and key != 'id':
+                    self.l_debug('discover_foscam','  {}={}'.format(key,value))
             lnode = self.get_node(cam['id'])
             if lnode:
                 self.l_info("discover_foscam","Already exists, updating %s %s" % (cam['id'], cam['name']))
@@ -284,11 +287,11 @@ class CameraController(polyinterface.Controller):
                     self.l_info("discover_foscam","Adding FoscamHD camera: %s" % (cam['name']))
                     self.addNode(FoscamHD2(self, self.user, self.password, udp_data=cam))
                     self.incr_num_cams()
-                    
+
                 else:
                     self.l_error("discover_foscam","Unknown type %s for Foscam Camera %s" % (cam['type'],cam['name']))
             self.l_info("discover_foscam","Done")
-        
+
     def on_exit(self, **kwargs):
         self.server.socket.close()
         return True
@@ -305,7 +308,7 @@ class CameraController(polyinterface.Controller):
 
     def http_get(self,ip,port,user,password,path,payload,auth_mode=0):
         url = "http://{}:{}/{}".format(ip,port,path)
-        
+
         self.l_debug("http_get","Sending: %s %s auth_mode=%d" % (url, payload, auth_mode) )
         if auth_mode == 0:
             auth = HTTPBasicAuth(user,password)
@@ -314,7 +317,7 @@ class CameraController(polyinterface.Controller):
         else:
             self.l_error('http_get',"Unknown auth_mode '%s' for request '%s'.  Must be 0 for 'digest' or 1 for 'basic'." % (auth_mode, url) )
             return False
-            
+
         try:
             response = requests.get(
                 url,
@@ -326,7 +329,7 @@ class CameraController(polyinterface.Controller):
         except requests.exceptions.RequestException as e:
             self.l_error('http_get',"Connection error for %s: %s" % (url, e))
             return False
-        self.l_debug('http_get',' Got: code=%s' % (response.status_code))
+        self.l_debug('http_get',' Got: code=%s text=%s' % (response.status_code,response.text))
         if response.status_code == 200:
             #self.l_debug('http_get',"http_get: Got: text=%s" % response.text)
             return response.text
@@ -344,16 +347,16 @@ class CameraController(polyinterface.Controller):
 
     def l_info(self, name, string):
         LOGGER.info("%s:%s: %s" %  (self.id,name,string))
-        
+
     def l_error(self, name, string):
         LOGGER.error("%s:%s: %s" % (self.id,name,string))
-        
+
     def l_warning(self, name, string):
         LOGGER.warning("%s:%s: %s" % (self.id,name,string))
-        
+
     def l_debug(self, name, string):
         LOGGER.debug("%s:%s: %s" % (self.id,name,string))
-        
+
     def set_num_cams(self,val):
         if val is None:
             val = 0
@@ -368,7 +371,7 @@ class CameraController(polyinterface.Controller):
             val = 0
         self.foscam_polling = int(val)
         self.setDriver('GV4', self.foscam_polling)
-        
+
     def set_debug_mode(self,val):
         if val is None:
             val = 0
@@ -388,7 +391,7 @@ class CameraController(polyinterface.Controller):
         self.long_poll = int(val)
         self.setDriver('GV7', self.long_poll)
         self.polyConfig['longPoll'] = val
-        
+
     def cmd_install_profile(self,command):
         self.l_info("cmd_install_profile","installing...")
         self.poly.installprofile()
@@ -404,12 +407,12 @@ class CameraController(polyinterface.Controller):
         val = int(command.get('value'))
         self.l_info("cmd_set_foscam_polling",val)
         self.set_foscam_polling(val)
-    
+
     def cmd_set_debug_mode(self,command):
         val = command.get('value')
         self.l_info("cmd_set_debug_mode",val)
         self.set_debug_mode(val)
-    
+
     def cmd_set_short_poll(self,command):
         val = command.get('value')
         self.l_info("cmd_set_short_poll",val)
@@ -448,4 +451,3 @@ class CameraController(polyinterface.Controller):
         {'driver': 'GV6', 'value': 5, 'uom': 25}, # shortpoll
         {'driver': 'GV7', 'value': 60, 'uom': 25}  # longpoll
     ]
-
