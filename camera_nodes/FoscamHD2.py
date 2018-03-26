@@ -272,6 +272,10 @@ class FoscamHD2(polyinterface.Node):
     #
     # Functions to grab current state of camera.
     #
+    def get_product_info(self,report=True):
+        rc = self.http_get_and_parse_keys('getProductAllInfo',"product")
+        return rc
+
     def get_cam_irled(self,report=True):
         rc = self.http_get_and_parse_keys('getInfraLedConfig',"irled")
         self.get_irled_state(report)
@@ -339,9 +343,20 @@ class FoscamHD2(polyinterface.Node):
         """
         self.get_status()
         if self.st:
+            self.get_product_info(report=False)
             self.get_cam_dev_state(report=False)
             self.get_cam_dev_info(report=False)
             self.get_cam_motion_detect_config(report=False)
+            self.l_info('get_cam_all',
+                "model={}, model_name={}, hardware_ver={}, firmware_ver={}, amba={}"
+                .format(
+                    self.cam_status['product']['model'],
+                    self.cam_status['product']['modelName'],
+                    self.cam_status['devinfo']['hardwareVer'],
+                    self.cam_status['devinfo']['firmwareVer'],
+                    self.amba
+                )
+            )
 
 
     def l_info(self, name, string):
