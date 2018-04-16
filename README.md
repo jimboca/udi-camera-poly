@@ -24,7 +24,7 @@ This node server is intended to support IP Cameras.
 
 ### FoscamHD2 (H.264)
 
-   Any Camera that uses the interface [Foscam IPCamera CGI User Guide](docs/Foscam-IPCamera-CGI-User-Guide-AllPlatforms-2015.11.06)
+   Any Camera that uses the interface [Foscam IPCamera CGI User Guide](docs/Foscam-IPCamera-CGI-User-Guide-AllPlatforms-2015.11.06.pdf)
    * Presets: To use the Goto preset control you must defined presets named "1", "2", "3", ... on the camera.  I would like to support using the preset names defined on the camera but that would require creating the profile.zip on the fly which is possible, but hasn't been done yet, and not sure it's worth the effort.
    * These cameras do not allow configuring a push notification when motion is sensed so you must enable motion polling which will poll the camera every short poll interval to check for motion.
 
