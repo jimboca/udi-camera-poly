@@ -69,6 +69,7 @@ class CameraController(polyinterface.Controller):
         self.num_cams       = self.getDriver('GV3')
         self.foscam_polling = self.getDriver('GV4')
         self.debug_mode     = self.getDriver('GV5')
+        self.hb             = 0
 
         # Short Poll
         val = self.getDriver('GV6')
@@ -122,6 +123,7 @@ class CameraController(polyinterface.Controller):
         or shortPoll. No need to Super this method the parent version does nothing.
         The timer can be overriden in the server.json.
         """
+        self.heartbeat()
         pass
 
     def query(self):
@@ -140,6 +142,15 @@ class CameraController(polyinterface.Controller):
         self.set_long_poll(self.long_poll)
         for node in self.nodes:
             self.nodes[node].reportDrivers()
+
+    def heartbeat(self):
+        self.l_info('heartbeat','hb={}'.format(self.hb))
+        if self.hb == 0:
+            self.reportCmd("DON",2)
+            self.hb = 1
+        else:
+            self.reportCmd("DOF",2)
+            self.hb = 0
 
     def discover(self, *args, **kwargs):
         """
@@ -442,7 +453,7 @@ class CameraController(polyinterface.Controller):
         'SET_LONGPOLL':  cmd_set_long_poll
     }
     drivers = [
-        {'driver': 'ST',  'value': 0, 'uom': 2},
+        {'driver': 'ST',  'value': 1, 'uom': 2},
         {'driver': 'GV1', 'value': 0, 'uom': 56}, # Major version of this code.
         {'driver': 'GV2', 'value': 0, 'uom': 56}, # Minor version of this code.
         {'driver': 'GV3', 'value': 0, 'uom': 56}, # Number of cameras we manage

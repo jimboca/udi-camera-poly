@@ -4,7 +4,7 @@ import polyinterface
 from amcrest import AmcrestCamera
 from functools import partial
 from camera_funcs import myint,myfloat,int2str,ip2long,long2ip,isBitI,setBit,clearBit,bool2int,str2int,str_d,get_valid_node_name,get_network_ip
-from Motion import Motion
+from camera_nodes import Motion
 import xml.etree.ElementTree as ET
 
 LOGGER = polyinterface.LOGGER

@@ -1,7 +1,7 @@
 
 import os
 import polyinterface
-from Motion import Motion
+from camera_nodes import Motion
 from functools import partial
 from camera_funcs import myint,myfloat,ip2long,long2ip
 

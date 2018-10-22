@@ -3,7 +3,7 @@ import os
 import polyinterface
 from functools import partial
 from camera_funcs import myint,myfloat,ip2long,long2ip,isBitI,setBit,clearBit
-from Motion import Motion
+from camera_nodes import Motion
 import xml.etree.ElementTree as ET
 
 LOGGER = polyinterface.LOGGER
@@ -223,7 +223,7 @@ class FoscamHD2(polyinterface.Node):
         if pfx not in self.cam_status:
             self.cam_status[pfx] = dict()
         if rc == 0:
-            for key in params.keys():
+            for key in sorted(params.keys()):
                 self.l_debug("save_keys","%s:%s=%s" % (pfx,key,params[key]))
                 self.cam_status[pfx][key] = params[key]
 
@@ -305,8 +305,10 @@ class FoscamHD2(polyinterface.Node):
             self.setDriver('GV6',  int(self.cam_status[mk]['isEnable']))
             if 'sensitivity' in self.cam_status[mk]:
                 self.setDriver('GV8',  int(self.cam_status[mk]['sensitivity']))
+            elif 'sensitivity1' in self.cam_status[mk]:
+                self.setDriver('GV8',  int(self.cam_status[mk]['sensitivity1']))
             else:
-                self.l_error('get_cam_motion_detect_config','No sensitivity in {}'.format(self.cam_status[mk]))
+                self.l_error('get_cam_motion_detect_config','No sensitivity or sensitivity1 in {}'.format(self.cam_status[mk]))
             self.setDriver('GV10', int(self.cam_status[mk]['triggerInterval']))
             self.setDriver('GV13', int(self.cam_status[mk]['snapInterval']))
             if 'linkage' in self.cam_status[mk]:
@@ -438,6 +440,7 @@ class FoscamHD2(polyinterface.Node):
         if value is None:
             self.l_error("set_motion_param","not passed a value: %s" % (value) )
             return False
+        self.get_cam_motion_detect_config(report=False)
         self.cam_status['motion_detect'][param] = myint(value)
         if self.set_motion_params():
             # TODO: Need the proper uom from the driver?
@@ -462,6 +465,7 @@ class FoscamHD2(polyinterface.Node):
             return False
         value = int(value)
         if 'linkage' in self.cam_status['motion_detect']:
+            self.get_cam_motion_detect_config(report=False)
             cval = int(self.cam_status['motion_detect']['linkage'])
             self.l_debug("set_motion_linkage","param=%s value=%s, bit=%d, motion_detect_linkage=%s" % (param,value,linkage_bits[param],cval))
             if value == 0:
