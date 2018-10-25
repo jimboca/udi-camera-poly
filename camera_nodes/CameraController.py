@@ -144,7 +144,7 @@ class CameraController(polyinterface.Controller):
             self.nodes[node].reportDrivers()
 
     def heartbeat(self):
-        self.l_info('heartbeat','hb={}'.format(self.hb))
+        self.l_debug('heartbeat','hb={}'.format(self.hb))
         if self.hb == 0:
             self.reportCmd("DON",2)
             self.hb = 1
@@ -233,9 +233,11 @@ class CameraController(polyinterface.Controller):
             elif node['node_def_id'] == "FoscamMJPEG":
                 self.l_info("add_existing_cams","Adding FoscamMJPEG camera: %s" % (node['name']))
                 self.addNode(FoscamMJPEG(self, self.user, self.password, node_data=node))
+                self.incr_num_cams()
             elif node['node_def_id'] == "FoscamHD2":
                 self.l_info("add_existing_cams","Adding FoscamHD2 camera: {0} = {1}".format(node['name'],node))
                 self.addNode(FoscamHD2(self, self.user, self.password, node_data=node))
+                self.incr_num_cams()
             elif node['node_def_id'] == 'CamMotion':
                 pass
             else:
@@ -383,11 +385,30 @@ class CameraController(polyinterface.Controller):
         self.foscam_polling = int(val)
         self.setDriver('GV4', self.foscam_polling)
 
-    def set_debug_mode(self,val):
-        if val is None:
-            val = 0
-        self.debug_mode = int(val)
+    def set_debug_mode(self,level):
+        if level is None:
+            level = 0
+        else:
+            level = int(level)
+        self.debug_mode = level
         self.setDriver('GV5', self.debug_mode)
+        if level == 0 or level == 10:
+            self.set_all_logs(logging.DEBUG)
+        elif level == 20:
+            self.set_all_logs(logging.INFO)
+        elif level == 30:
+            self.set_all_logs(logging.WARNING)
+        elif level == 40:
+            self.set_all_logs(logging.ERROR)
+        elif level == 50:
+            self.set_all_logs(logging.CRITICAL)
+        else:
+            self.l_error("set_debug_mode","Unknown level {0}".format(level))
+
+    def set_all_logs(self,level):
+        LOGGER.setLevel(level)
+        logging.getLogger('requests').setLevel(level)
+        logging.getLogger('urllib3').setLevel(level)
 
     def set_short_poll(self,val):
         if val is None:

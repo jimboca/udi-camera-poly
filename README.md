@@ -106,6 +106,9 @@ Open the Polyglot web page, go to nodeserver store and click "Update" for "Camer
 
 # Release Notes
 
+- 2.1.10
+  - Fix setting number of cameras on controller
+  - Setting debug mode actually changes the logging mode
 - 2.1.9
   - Fix initialization of controller ST
   - Add controller heartbeat which sends DON/DOF
