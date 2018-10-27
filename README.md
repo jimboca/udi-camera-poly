@@ -61,6 +61,11 @@ Just search for get_cam_all in your log to find them.
    * Really, do the backup, please
 2. Go to the Polyglot Store in the UI and install.
 3. Add Camera NodeServer in Polyglot
+   * To do a manual install if Polyglot Fails ```
+   cd ~/.polyglot/nodeservers
+   git clone https://github.com/jimboca/udi-camera-poly Camera
+   cd Camera
+   ./install.sh```
 4. Go to the Camera NodeServer Configuration Page
    * Set user and password for camera it may take a few seconds for the default user and password to show up in the configuration page, just wait and they should show up, then change the defaults for your cameras.
    * Currently all cameras must use the same.
