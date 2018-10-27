@@ -65,7 +65,8 @@ Just search for get_cam_all in your log to find them.
 ```cd ~/.polyglot/nodeservers
    git clone https://github.com/jimboca/udi-camera-poly Camera
    cd Camera
-   ./install.sh```
+   ./install.sh
+```
 4. Go to the Camera NodeServer Configuration Page
    * Set user and password for camera it may take a few seconds for the default user and password to show up in the configuration page, just wait and they should show up, then change the defaults for your cameras.
    * Currently all cameras must use the same.
