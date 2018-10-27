@@ -61,8 +61,8 @@ Just search for get_cam_all in your log to find them.
    * Really, do the backup, please
 2. Go to the Polyglot Store in the UI and install.
 3. Add Camera NodeServer in Polyglot
-   * To do a manual install if Polyglot Fails ```
-   cd ~/.polyglot/nodeservers
+   * To do a manual install if Polyglot Fails 
+```cd ~/.polyglot/nodeservers
    git clone https://github.com/jimboca/udi-camera-poly Camera
    cd Camera
    ./install.sh```
