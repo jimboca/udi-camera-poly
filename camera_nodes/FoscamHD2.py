@@ -46,7 +46,7 @@ class FoscamHD2(polyinterface.Node):
         self.name      = udp_data['name']
         self.ip        = udp_data['ip']
         self.port      = udp_data['port']
-        self.full_sys_ver = str(udp_data['sys'])
+        self.parse_sys_ver(udp_data['sys'])
 
     def update_drivers(self):
         self.setDriver('GV2',  ip2long(self.ip))
