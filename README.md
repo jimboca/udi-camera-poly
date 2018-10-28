@@ -111,6 +111,8 @@ Open the Polyglot web page, go to nodeserver store and click "Update" for "Camer
 
 # Release Notes
 
+- 2.1.11
+  - Fix install issues
 - 2.1.10
   - Fix setting number of cameras on controller
   - Setting debug mode actually changes the logging mode
