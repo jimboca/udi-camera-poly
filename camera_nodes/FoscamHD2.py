@@ -20,6 +20,7 @@ IS_AMBA = {
     "FI9826P+V2" : False,
     "FI9828P+V2" : False,
     "R2 V4"      : True,
+    "R4"         : True,
     "FI9900P"    : True,
 }
 
