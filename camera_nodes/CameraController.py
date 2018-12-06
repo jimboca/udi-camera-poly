@@ -1,6 +1,7 @@
 
 import polyinterface
 import os, json, logging, requests, threading,  re, socket, yaml
+from copy import deepcopy
 # SocketServer,
 from requests.auth import HTTPDigestAuth,HTTPBasicAuth
 from http.client import BadStatusLine  # Python 3.x
@@ -322,9 +323,9 @@ class CameraController(polyinterface.Controller):
     def http_get(self,ip,port,user,password,path,payload,auth_mode=0):
         url = "http://{}:{}/{}".format(ip,port,path)
 
-        payload_mask = payload
+        payload_mask = deepcopy(payload)
         payload_mask['pwd'] = '*'
-        self.l_debug("http_get","Sending: %s %s auth_mode=%d" % (url, payload, auth_mode) )
+        self.l_debug("http_get","Sending: %s %s auth_mode=%d" % (url, payload_mask, auth_mode) )
         if auth_mode == 0:
             auth = HTTPBasicAuth(user,password)
         elif auth_mode == 1:
