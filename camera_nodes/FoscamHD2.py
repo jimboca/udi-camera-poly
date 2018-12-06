@@ -341,6 +341,11 @@ class FoscamHD2(polyinterface.Node):
             connected = False
         self.set_st(connected)
 
+    def set_amba(self):
+        """
+        Figure out if it's an "Amba S2L" camera which uses some different http calls
+        """
+
     def get_cam_all(self,report=True):
         """
         Call get_status on the camera and store in status
@@ -350,6 +355,7 @@ class FoscamHD2(polyinterface.Node):
             self.get_product_info(report=False)
             self.get_cam_dev_state(report=False)
             self.get_cam_dev_info(report=False)
+            self.set_amba()
             self.get_cam_motion_detect_config(report=False)
             self.l_info('get_cam_all',
                 "model={}, model_name={}, hardware_ver={}, firmware_ver={}, amba={}"
