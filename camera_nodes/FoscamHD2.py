@@ -146,10 +146,10 @@ class FoscamHD2(polyinterface.Node):
             self.sys_e_ver = myfloat("%d.%d" % (int(vnums[2]),int(vnums[3])),2)
             self.l_debug("parse_sys_ver","sys_s_ver={} sys_e_ver".format(self.sys_s_ver,self.sys_e_ver))
             if self.sys_s_ver == 1.11:
-                self.l_info('parse_sys_ver','This IS an Amba Camera')
+                self.l_info('parse_sys_ver','This {} IS an Amba Camera'format(self.sys_s_ver))
                 self.amba = True
             else:
-                self.l_info('parse_sys_ver','This IS NOT an Amba Camera')
+                self.l_info('parse_sys_ver','This {} IS NOT an Amba Camera'.format(self.sys_s_ver))
                 self.amba = False
         else:
             self.l_waning("parse_sys_ver","Unknown sys_Ver{}".format(sys_ver))
