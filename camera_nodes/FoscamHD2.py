@@ -345,14 +345,14 @@ class FoscamHD2(polyinterface.Node):
         Figure out if it's an "Amba S2L" camera which uses some different http calls
         """
         if self.cam_status['product']['modelName'] in IS_AMBA:
-            self.amba = IS_AMBA[self.cam_status['product']['model']]
+            self.amba = IS_AMBA[self.cam_status['product']['modelName']]
             self.l_info('set_cam_all','Using known Amba setting for {}={}'
-                        .format(self.cam_status['product']['model'],self.amba))
+                        .format(self.cam_status['product']['modelName'],self.amba))
         else:
             # We will assume it is not...
             self.amba = False
             self.l_info('set_cam_all','Assuming NOT Amba setting for {}={}'
-                        .format(self.cam_status['product']['model'],self.amba))
+                        .format(self.cam_status['product']['modelName'],self.amba))
         self.l_info('set_cam_all',
                     "model={}, model_name={}, hardware_ver={}, firmware_ver={}, amba={}"
                     .format(
