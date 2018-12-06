@@ -149,7 +149,7 @@ class FoscamHD2(polyinterface.Node):
                 self.l_info('parse_sys_ver','This IS an Amba Camera')
                 self.amba = True
             else:
-                self.l_info('parse_sys_ver','This IS an Amba Camera')
+                self.l_info('parse_sys_ver','This IS NOT an Amba Camera')
                 self.amba = False
         else:
             self.l_waning("parse_sys_ver","Unknown sys_Ver{}".format(sys_ver))
