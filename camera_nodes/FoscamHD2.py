@@ -147,7 +147,7 @@ class FoscamHD2(polyinterface.Node):
             self.l_debug("parse_sys_ver","sys_s_ver={} sys_e_ver".format(self.sys_s_ver,self.sys_e_ver))
             # These are ones I know are not Amba... 1.4 and 1.5
             # TODO: Need a better way to detect this...
-            if self.sys_s_ver <= 1.5:
+            if self.sys_s_ver == 1.4 or self.sys_s_ver == 1.5:
                 self.l_info('parse_sys_ver','This {} IS NOT an Amba Camera'.format(self.sys_s_ver))
                 self.amba = False
             else:
