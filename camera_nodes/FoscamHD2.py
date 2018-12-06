@@ -19,7 +19,7 @@ linkage_bits = { "ring":0, "send_mail":1, "snap_picture":2, "record":3 }
 IS_AMBA = {
     "FI9826P+V2" : False,
     "FI9828P+V2" : False,
-    "R2 V4"      : True,
+    "R2+V4"      : True,
     "R4"         : True,
     "FI9900P"    : True,
 }
