@@ -16,6 +16,13 @@ LOGGER = polyinterface.LOGGER
 #bit3:Record
 linkage_bits = { "ring":0, "send_mail":1, "snap_picture":2, "record":3 }
 
+IS_AMBA = {
+    "FI9826P+V2" : False,
+    "FI9828P+V2" : False,
+    "R2 V4"      : True,
+    "FI9900P"    : True,
+}
+
 class FoscamHD2(polyinterface.Node):
     def __init__(self, controller, user, password, udp_data=None, node_data=None):
         self.user = user
@@ -145,14 +152,6 @@ class FoscamHD2(polyinterface.Node):
             self.sys_s_ver = myfloat("%d.%d" % (int(vnums[0]),int(vnums[1])),2)
             self.sys_e_ver = myfloat("%d.%d" % (int(vnums[2]),int(vnums[3])),2)
             self.l_debug("parse_sys_ver","sys_s_ver={} sys_e_ver".format(self.sys_s_ver,self.sys_e_ver))
-            # These are ones I know are not Amba... 1.4 and 1.5
-            # TODO: Need a better way to detect this...
-            if self.sys_s_ver == 1.4 or self.sys_s_ver == 1.5:
-                self.l_info('parse_sys_ver','This {} IS NOT an Amba Camera'.format(self.sys_s_ver))
-                self.amba = False
-            else:
-                self.l_info('parse_sys_ver','This {} IS an Amba Camera'.format(self.sys_s_ver))
-                self.amba = True
         else:
             self.l_waning("parse_sys_ver","Unknown sys_Ver{}".format(sys_ver))
             self.sys_s_ver = None
@@ -341,10 +340,29 @@ class FoscamHD2(polyinterface.Node):
             connected = False
         self.set_st(connected)
 
-    def set_amba(self):
+    def set_cam_all(self):
         """
         Figure out if it's an "Amba S2L" camera which uses some different http calls
         """
+        if self.cam_status['product']['modelName'] in IS_AMBA:
+            self.amba = IS_AMBA[self.cam_status['product']['model']]
+            self.l_info('set_cam_all','Using known Amba setting for {}={}'
+                        .format(self.cam_status['product']['model'],self.amba))
+        else:
+            # We will assume it is not...
+            self.amba = False
+            self.l_info('set_cam_all','Assuming NOT Amba setting for {}={}'
+                        .format(self.cam_status['product']['model'],self.amba))
+        self.l_info('set_cam_all',
+                    "model={}, model_name={}, hardware_ver={}, firmware_ver={}, amba={}"
+                    .format(
+                        self.cam_status['product']['model'],
+                        self.cam_status['product']['modelName'],
+                        self.cam_status['devinfo']['hardwareVer'],
+                        self.cam_status['devinfo']['firmwareVer'],
+                        self.amba
+                    )
+                )
 
     def get_cam_all(self,report=True):
         """
@@ -355,19 +373,8 @@ class FoscamHD2(polyinterface.Node):
             self.get_product_info(report=False)
             self.get_cam_dev_state(report=False)
             self.get_cam_dev_info(report=False)
-            self.set_amba()
+            self.set_cam_all()
             self.get_cam_motion_detect_config(report=False)
-            self.l_info('get_cam_all',
-                "model={}, model_name={}, hardware_ver={}, firmware_ver={}, amba={}"
-                .format(
-                    self.cam_status['product']['model'],
-                    self.cam_status['product']['modelName'],
-                    self.cam_status['devinfo']['hardwareVer'],
-                    self.cam_status['devinfo']['firmwareVer'],
-                    self.amba
-                )
-            )
-
 
     def l_info(self, name, string):
         LOGGER.info("%s:%s:%s: %s" %  (self.id,self.name,name,string))
