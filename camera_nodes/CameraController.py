@@ -323,9 +323,11 @@ class CameraController(polyinterface.Controller):
     def http_get(self,ip,port,user,password,path,payload,auth_mode=0):
         url = "http://{}:{}/{}".format(ip,port,path)
 
-        payload_mask = deepcopy(payload)
-        if 'pwd' in payload_mask:
+        if 'pwd' in payload:
+            payload_mask = deepcopy(payload)
             payload_mask['pwd'] = '*'
+        else:
+            payload_mask = payload
         self.l_debug("http_get","Sending: %s %s auth_mode=%d" % (url, payload_mask, auth_mode) )
         if auth_mode == 0:
             auth = HTTPBasicAuth(user,password)
