@@ -35,7 +35,7 @@ This node server is intended to support IP Cameras.
 | -------- |------------ | ---------------- | ---------------- | ----
 |  1035    | FI9826P+V2  |   1.5.3.19       | 2.21.2.27        | False
 |    50    | FI9828P+V2  |   1.4.1.10       | 2.11.1.133       | False
-|  5096    | R2 V4       |   1.11.1.11      | 2.71.1.59        | True
+|  5096    | R2+V4       |   1.11.1.13      | 2.71.1.64_p1     | True
 |  5007    | R4          |   1.11.1.13      | 2.71.1.64_p1     | True
 |          | FI9900P     |                  |                  | True?
 |          | FI9928P     |                  |                  | True
@@ -45,9 +45,9 @@ This node server is intended to support IP Cameras.
 
 If you have a camera that is not on this list, please look for this line in your nodeserver debug.log and send it to me or add it here yourself if you can.
 ```
-2018-03-25 19:24:21,540 INFO     FoscamHD2:CamOutEntry:get_cam_all: model=50, model_name=FI9828P+V2, hardware_ver=1.4.1.10, firmware_ver=2.11.1.133, amba=False
+2018-03-25 19:24:21,540 INFO     FoscamHD2:CamOutEntry:set_cam_all: model=50, model_name=FI9828P+V2, hardware_ver=1.4.1.10, firmware_ver=2.11.1.133, amba=False
 ```
-Just search for get_cam_all in your log to find them.
+Just search for get_cam_all in your log on the nodeserver web page, or on your polyglot machine: grep set_cam_all debug.log
 
 ### Amcrest
 
@@ -100,7 +100,7 @@ Each Camera is added with a Motion node, you can right-click the camera and sele
 
 1. Polyglot V2 itself should be run on Raspian Stretch.
   To check your version, ```cat /etc/os-release``` and the first line should look like
-  ```PRETTY_NAME="Raspbian GNU/Linux 9 (stretch)"```. It is possible to upgrade from Jessie to
+  ``` PRETTY_NAME="Raspbian GNU/Linux 9 (stretch)"  ```. It is possible to upgrade from Jessie to
   Stretch, but I would recommend just reimaging the SD card.  Some helpful links:
    * https://www.raspberrypi.org/blog/raspbian-stretch/
    * https://linuxconfig.org/raspbian-gnu-linux-upgrade-from-jessie-to-raspbian-stretch-9
@@ -112,6 +112,9 @@ Open the Polyglot web page, go to nodeserver store and click "Update" for "Camer
 
 # Release Notes
 
+- 2.1.12
+  - Determine 'ABMA S2L' based on camera modelName
+  - Mask out passwords in log
 - 2.1.11
   - Fix install issues
 - 2.1.10
