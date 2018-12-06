@@ -36,13 +36,14 @@ This node server is intended to support IP Cameras.
 |  1035    | FI9826P+V2  |   1.5.3.19       | 2.21.2.27        | False
 |    50    | FI9828P+V2  |   1.4.1.10       | 2.11.1.133       | False
 |  5096    | R2 V4       |   1.11.1.11      | 2.71.1.59        | True
+|  5007    | R4          |   1.11.1.13      | 2.71.1.64_p1     | True
 |          | FI9900P     |                  |                  | True?
-
+|          | FI9928P     |                  |                  | True
 
    Notes:
     * Amba means it uses the "Amba S2L" as documented in section 8 of the pdf above.  If you are not sure if that is needed for your camera enable/disable motion detection and see if the nodeserver log shows <result>-3</result> this may mean we need to update the nodeserver to understand this for your camera.  Currently this is enabled when System Firmware starts with 1.11.  I think the FI9900P Cameras need this enabled but I don't have an example.
 
-If you have a camera that is not on this list, please look for this line in your nodeserver log and send it to me or add it here yourself if you can.
+If you have a camera that is not on this list, please look for this line in your nodeserver debug.log and send it to me or add it here yourself if you can.
 ```
 2018-03-25 19:24:21,540 INFO     FoscamHD2:CamOutEntry:get_cam_all: model=50, model_name=FI9828P+V2, hardware_ver=1.4.1.10, firmware_ver=2.11.1.133, amba=False
 ```
@@ -61,7 +62,7 @@ Just search for get_cam_all in your log to find them.
    * Really, do the backup, please
 2. Go to the Polyglot Store in the UI and install.
 3. Add Camera NodeServer in Polyglot
-   * To do a manual install if Polyglot Fails 
+   * To do a manual install if Polyglot Fails
       * cd ~/.polyglot/nodeservers
       * git clone https://github.com/jimboca/udi-camera-poly Camera
       * cd Camera
