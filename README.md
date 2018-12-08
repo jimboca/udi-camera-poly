@@ -108,10 +108,17 @@ Each Camera is added with a Motion node, you can right-click the camera and sele
 
 # Upgrading
 
-Open the Polyglot web page, go to nodeserver store and click "Update" for "Camera".
+1. Open the Polyglot web page
+  1. Go to nodeserver store and click "Update" for "Camera".
+  1. Go to the dashboard, select Details for the Camera Nodeserver
+  1. Click Restart
+1. If the release has a (Profile Change) then the profile will be updated but if you had the Admin Console open, you will need to close and open it again.
 
 # Release Notes
 
+- 2.1.14:
+  - Add Push To Phone for FoscamHD2 Cameras (Profile change)
+  - Auto update profile based on version.txt
 - 2.1.13:
   - FI9928P﻿ is Amba=True
 - 2.1.12
