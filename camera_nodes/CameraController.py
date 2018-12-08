@@ -350,7 +350,7 @@ class CameraController(polyinterface.Controller):
             self.l_error('http_get',"Connection error for %s: %s" % (url, e))
             return False
         self.l_debug('http_get',' Got: code=%s' % (response.status_code))
-        self.l_debug('http_get','      text=%s' % (response.text))
+        #self.l_debug('http_get','      text=%s' % (response.text))
         if response.status_code == 200:
             #self.l_debug('http_get',"http_get: Got: text=%s" % response.text)
             return response.text
