@@ -38,7 +38,7 @@ This node server is intended to support IP Cameras.
 |  5096    | R2+V4       |   1.11.1.13      | 2.71.1.64_p1     | True
 |  5007    | R4          |   1.11.1.13      | 2.71.1.64_p1     | True
 |          | FI9900P     |                  |                  | True?
-|          | FI9928P     |                  |                  | True
+|  5094    | FI9928P﻿     |   1.11.1.13      | 2.74.1.64        | True
 
    Notes:
     * Amba means it uses the "Amba S2L" as documented in section 8 of the pdf above.  If you are not sure if that is needed for your camera enable/disable motion detection and see if the nodeserver log shows <result>-3</result> this may mean we need to update the nodeserver to understand this for your camera.  Currently this is enabled when System Firmware starts with 1.11.  I think the FI9900P Cameras need this enabled but I don't have an example.
@@ -112,6 +112,8 @@ Open the Polyglot web page, go to nodeserver store and click "Update" for "Camer
 
 # Release Notes
 
+- 2.1.13:
+  - FI9928P﻿ is Amba=True
 - 2.1.12
   - Determine 'ABMA S2L' based on camera modelName
   - Mask out passwords in log

@@ -31,6 +31,7 @@ IS_AMBA = {
     "R2+V4"      : True,
     "R4"         : True,
     "FI9900P"    : True,
+    "FI9928P"    : True,
 }
 
 class FoscamHD2(polyinterface.Node):
