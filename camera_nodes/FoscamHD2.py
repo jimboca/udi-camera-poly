@@ -14,7 +14,16 @@ LOGGER = polyinterface.LOGGER
 #bit1:Send mail
 #bit2:Snap picture
 #bit3:Record
-linkage_bits = { "ring":0, "send_mail":1, "snap_picture":2, "record":3 }
+#bit7:Push To Phone
+#2018-12-07 18:59:08,821 [Controller] [DEBUG] FoscamHD2:CamFamilyRoom:get_cam_motion_detect_config: linkage=0 ring=0 send_mail=0 snap_picture=0 record=0 push=0
+#2018-12-07 18:59:36,483 [Controller] [DEBUG] FoscamHD2:CamFamilyRoom:get_cam_motion_detect_config: linkage=1 ring=1 send_mail=0 snap_picture=0 record=0 push=0
+#2018-12-07 18:59:58,469 [Controller] [DEBUG] FoscamHD2:CamFamilyRoom:get_cam_motion_detect_config: linkage=2 ring=0 send_mail=1 snap_picture=0 record=0 push=0
+#2018-12-07 19:00:20,040 [Controller] [DEBUG] FoscamHD2:CamFamilyRoom:get_cam_motion_detect_config: linkage=4 ring=0 send_mail=0 snap_picture=1 record=0 push=0
+#2018-12-07 19:00:44,441 [Controller] [DEBUG] FoscamHD2:CamFamilyRoom:get_cam_motion_detect_config: linkage=8 ring=0 send_mail=0 snap_picture=0 record=1 push=0
+#2018-12-07 19:01:19,768 [Controller] [DEBUG] FoscamHD2:CamFamilyRoom:get_cam_motion_detect_config: linkage=128 ring=0 send_mail=0 snap_picture=0 record=0 push-1
+# No idea what 16, 32, 64 are?
+#                    1           2                4              8       16      32       64      128
+linkage_bits = { "ring":0, "send_mail":1, "snap_picture":2, "record":3, "16":4, "32":5, "64":6, "push":7 }
 
 IS_AMBA = {
     "FI9826P+V2" : False,
@@ -319,6 +328,15 @@ class FoscamHD2(polyinterface.Node):
                 self.setDriver('GV14', isBitI(sl,linkage_bits['snap_picture']))
                 self.setDriver('GV4',  isBitI(sl,linkage_bits['record']))
                 self.setDriver('GV0', isBitI(sl,linkage_bits['ring']))
+                self.setDriver('GV15', isBitI(sl,linkage_bits['push']))
+                self.l_debug('get_cam_motion_detect_config','linkage={} ring={} send_mail={} snap_picture={} record={} push={}'.
+                    format(sl,
+                        isBitI(sl,linkage_bits['ring']),
+                        isBitI(sl,linkage_bits['send_mail']),
+                        isBitI(sl,linkage_bits['snap_picture']),
+                        isBitI(sl,linkage_bits['record']),
+                        isBitI(sl,linkage_bits['push']),
+                        ))
             else:
                 self.l_error('get_cam_motion_detect_config','No linkage in {}'.format(self.cam_status[mk]))
         return st
@@ -537,6 +555,9 @@ class FoscamHD2(polyinterface.Node):
     def cmd_set_mo_pic(self,command):
         self.set_motion_linkage('GV14','snap_picture',command.get("value"))
 
+    def cmd_set_mo_push(self,command):
+        self.set_motion_linkage('GV15','push',command.get("value"))
+
     def cmd_set_mo_rec(self,command):
         self.set_motion_linkage('GV4','record',command.get("value"))
 
@@ -559,7 +580,8 @@ class FoscamHD2(polyinterface.Node):
         {'driver': 'GV11', 'value': 0,  'uom': 56}, # Camera System Version
         {'driver': 'GV12', 'value': 0,  'uom': 56}, # Minor version of this code.
         {'driver': 'GV13', 'value': 0,  'uom': 25}, # Snap Interval
-        {'driver': 'GV14', 'value': 0,  'uom': 2}   # Motion Picture
+        {'driver': 'GV14', 'value': 0,  'uom': 2},  # Motion Picture
+        {'driver': 'GV15', 'value': 0,  'uom': 2}   # Push To Phone
     ]
     id = 'FoscamHD2'
     commands = {
@@ -573,6 +595,7 @@ class FoscamHD2(polyinterface.Node):
         'SET_MO_PIC':     cmd_set_mo_pic,     # GV14
         'SET_MO_REC':     cmd_set_mo_rec,     # GV4
         'SET_MO_PIC_INT': cmd_set_mo_pic_int, # GV13
+        'SET_MO_PUSH':    cmd_set_mo_push,    # GV15
         'SET_POS':        cmd_goto_preset,
         'REBOOT':         cmd_reboot,
     }

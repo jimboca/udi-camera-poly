@@ -7,7 +7,7 @@ from requests.auth import HTTPDigestAuth,HTTPBasicAuth
 from http.client import BadStatusLine  # Python 3.x
 from foscam_poll import foscam_poll
 from camera_nodes import *
-from camera_funcs import myint,long2ip,get_server_data
+from camera_funcs import myint,long2ip,get_server_data,get_profile_info
 from CameraREST import CameraREST
 
 LOGGER = polyinterface.LOGGER
@@ -96,6 +96,7 @@ class CameraController(polyinterface.Controller):
         self.rest_server = CameraREST(self)
         self.rest_server.start()
 
+        self.check_profile()
         self.query();
         self.load_params()
         self.add_all_cams()
@@ -349,7 +350,7 @@ class CameraController(polyinterface.Controller):
             self.l_error('http_get',"Connection error for %s: %s" % (url, e))
             return False
         self.l_debug('http_get',' Got: code=%s' % (response.status_code))
-        #self.l_debug('http_get',' Got: text=%s' % (response.text))
+        self.l_debug('http_get','      text=%s' % (response.text))
         if response.status_code == 200:
             #self.l_debug('http_get',"http_get: Got: text=%s" % response.text)
             return response.text
@@ -364,6 +365,22 @@ class CameraController(polyinterface.Controller):
         else:
             self.l_error('http_get',"Unknown response %s: %s" % (response.status_code, url) )
         return False
+
+    def check_profile(self):
+        self.profile_info = get_profile_info(LOGGER)
+        # Set Default profile version if not Found
+        cdata = deepcopy(self.polyConfig['customData'])
+        self.l_info('check_profile','profile_info={0} customData={1}'.format(self.profile_info,cdata))
+        if not 'profile_info' in cdata:
+            cdata['profile_info'] = { 'version': 0 }
+        if self.profile_info['version'] == cdata['profile_info']['version']:
+            self.update_profile = False
+        else:
+            self.update_profile = True
+            self.poly.installprofile()
+        self.l_info('check_profile','update_profile={}'.format(self.update_profile))
+        cdata['profile_info'] = self.profile_info
+        self.saveCustomData(cdata)
 
     def l_info(self, name, string):
         LOGGER.info("%s:%s: %s" %  (self.id,name,string))

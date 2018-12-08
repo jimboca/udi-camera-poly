@@ -96,6 +96,7 @@ ST-FOSHD2-GV11-NAME = Camera System Version
 ST-FOSHD2-GV12-NAME = Polyglot Node Version Minor
 ST-FOSHD2-GV13-NAME = Motion Snapshot Interval
 ST-FOSHD2-GV14-NAME = Motion Snap Picture
+ST-FOSHD2-GV15-NAME = Push To Phone
 ST-FOSHD2-GV0-NAME = Motion Ring
 
 CMD-ST-NAME = Query
@@ -111,6 +112,7 @@ CMD-FOSHD2-SET_MO_RING-NAME = Set Motion Ring
 CMD-FOSHD2-SET_MO_PIC-NAME = Set Motion Snap Picture
 CMD-FOSHD2-SET_MO_PIC_INT-NAME = Set Motion Snap Picture Interval
 CMD-FOSHD2-SET_MO_REC-NAME = Set Motion Record
+CMD-FOSHD2-SET_MO_PUSH-NAME = Push To Phone
 
 
 POS-1 = Preset 1
@@ -195,7 +197,7 @@ MOOA-2 = Auto
 # led_mode for the network led on the back of the camera.
 # It is 0 (zero) 1 (one) O (Letter O=Off)
 #  http://ip/set_misc.cgi?led_mode=0 : Led indicates network connection
-#  http://ip/set_misc.cgi?led_mode=1 : Led indicates connected network type 
+#  http://ip/set_misc.cgi?led_mode=1 : Led indicates connected network type
 #  http://ip/set_misc.cgi?led_mode=2 : Led deactivated except during camera boot
 NLEDM-0 = Network Connection
 NLEDM-1 = Network Type

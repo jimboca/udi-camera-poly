@@ -120,6 +120,7 @@
       <st id="GV14" editor="BOOL" />      <!-- Motion Picture -->
       <st id="GV13" editor="I_MOP5" />    <!-- Motion Snap Interval -->
       <st id="GV4" editor="BOOL" />      <!-- Motion Record -->
+      <st id="GV15" editor="BOOL" />      <!-- Motion Push To Phone -->
       <st id="GV8" editor="I_MOS04" />    <!-- Motion Sensitivity -->
     </sts>
     <cmds>
@@ -161,7 +162,10 @@
         <cmd id="SET_MO_REC">
           <p id="" editor="BOOL" init="GV4" />
         </cmd>
-	<!-- Set camera position to one of 16 presets -->
+  <!--  Enable record for motion alarm -->
+        <cmd id="SET_MO_PUSH">
+          <p id="" editor="BOOL" init="GV15" />
+        </cmd>	<!-- Set camera position to one of 16 presets -->
         <cmd id="SET_POS">
           <p id="" editor="I_POS16" />
         </cmd>
