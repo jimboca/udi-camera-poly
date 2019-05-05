@@ -271,11 +271,11 @@ class Amcrest(polyinterface.Node):
 
     def cmd_set_vmd_record(self,command):
         value = command.get("value")
-        self.set_motion_param(driver="GV6", param='MailEnable', convert="int2str", value=value)
+        self.set_motion_param(driver="GV6", param='RecordEnable', convert="int2str", value=value)
 
     def cmd_set_vmd_email(self,command):
         value = command.get("value")
-        self.set_motion_param(driver="GV7", param='RecordEnable', convert="int2str", value=value)
+        self.set_motion_param(driver="GV7", param='MailEnable', convert="int2str", value=value)
 
     def cmd_set_vmd_snapshot(self,command):
         value = command.get("value")

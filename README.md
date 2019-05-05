@@ -116,6 +116,9 @@ Each Camera is added with a Motion node, you can right-click the camera and sele
 
 # Release Notes
 
+- 2.1.15: 2019/05/05
+  - Fix Amcrest Record and Mail enable were swapped.
+  - Fix crash for not responding FoscamHD2
 - 2.1.14:
   - Add Push To Phone for FoscamHD2 Cameras (Profile change)
   - Auto update profile based on version.txt
