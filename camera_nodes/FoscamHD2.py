@@ -302,7 +302,7 @@ class FoscamHD2(polyinterface.Node):
         rc = self.http_get_and_parse_keys('getDevInfo',"devinfo")
         # Update sys_ver if it's different
         self.l_info('get_cam_dev_state','got {0}'.format(rc))
-        if rc != -2 and self.full_sys_ver != str(self.cam_status['devinfo']['hardwareVer']):
+        if rc != -2 and rc != -1 and self.full_sys_ver != str(self.cam_status['devinfo']['hardwareVer']):
             self.l_info("get_cam_dev_info","New sys_ver %s != %s" % (self.full_sys_ver,str(self.cam_status['devinfo']['hardwareVer'])))
             self.parse_sys_ver(self.cam_status['devinfo']['hardwareVer'])
             self.setDriver('GV11', self.sys_s_ver)
