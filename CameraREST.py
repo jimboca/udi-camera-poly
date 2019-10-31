@@ -44,7 +44,7 @@ class CameraREST():
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
                 s.connect((remote_server, 80))
-                return s.getsockname()[0]
+                rt = s.getsockname()[0]
         except Exception as err:
             self.parent.logger.error('CameraREST:get_network_ip: failed: {0}'.format(err))
             rt = False
