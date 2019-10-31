@@ -3,7 +3,7 @@ import os
 import polyinterface
 from amcrest import AmcrestCamera
 from functools import partial
-from camera_funcs import myint,myfloat,int2str,ip2long,long2ip,isBitI,setBit,clearBit,bool2int,str2int,str_d,get_valid_node_name,get_network_ip
+from camera_funcs import myint,myfloat,int2str,ip2long,long2ip,isBitI,setBit,clearBit,bool2int,str2int,str_d,get_valid_node_name
 from camera_nodes import Motion
 import xml.etree.ElementTree as ET
 
@@ -51,7 +51,8 @@ class Amcrest(polyinterface.Node):
         self.address = get_valid_node_name(self.camera.serial_number.split()[0][-14:].lower())
         # Name is the machine name
         self.name      = get_valid_node_name(self.camera.machine_name.split('=')[-1].rstrip())
-        self.ip = get_network_ip(self.host)
+        #self.ip = get_network_ip(self.host)
+        self.ip = "1.2.3.4"
         self.sys_ver      = 0
 
     def update_drivers(self):
