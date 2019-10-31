@@ -37,7 +37,7 @@ class CameraREST():
         self.thread.start()
 
     # From: https://stackoverflow.com/questions/24196932/how-can-i-get-the-ip-address-from-nic-in-python
-    def get_network_ip(remote_server="8.8.8.8"):
+    def get_network_ip(self,remote_server="8.8.8.8"):
         """
         Return the/a network-facing IP number for this system.
         """
