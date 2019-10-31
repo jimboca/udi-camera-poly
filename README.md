@@ -116,6 +116,9 @@ Each Camera is added with a Motion node, you can right-click the camera and sele
 
 # Release Notes
 
+- 2.1.16: 2019/10/30
+  - Fix crash when can't figure our local ip address because 8.8.8.8 is not available
+    - This means the RESTServer will not be running, so Motion push from old foscam's will not work
 - 2.1.15: 2019/05/05
   - Fix Amcrest Record and Mail enable were swapped.
   - Fix crash for not responding FoscamHD2
