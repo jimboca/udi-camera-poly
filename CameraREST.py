@@ -1,5 +1,6 @@
 
 import requests, threading, socketserver, re, socket
+from camera_funcs import get_network_ip
 from http.client import BadStatusLine  # Python 3.x
 
 class EchoRequestHandler(socketserver.BaseRequestHandler):
@@ -36,20 +37,11 @@ class CameraREST():
         #t.setDaemon(True) # don't hang on exit
         self.thread.start()
 
-    # From: https://stackoverflow.com/questions/24196932/how-can-i-get-the-ip-address-from-nic-in-python
-    def get_network_ip(self,remote_server="8.8.8.8"):
+    def get_network_ip(self):
         """
         Return the/a network-facing IP number for this system.
         """
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-                s.connect((remote_server, 80))
-                rt = s.getsockname()[0]
-        except Exception as err:
-            self.parent.logger.error('CameraREST:get_network_ip: failed: {0}'.format(err))
-            rt = False
-        self.parent.logger.info('CameraRest:get_network_ip: Returning {0}'.format(rt))
-        return rt
+        return get_network_ip(self.parent.logger)
 
     def handler(self, data):
         self.parent.logger.debug("CameraRestServer:handler: Got {0}".format(data.strip()))

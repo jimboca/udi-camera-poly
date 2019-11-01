@@ -9,7 +9,7 @@ import sys
 import time
 import select
 from struct import unpack,pack
-from camera_funcs import get_valid_node_name
+from camera_funcs import get_valid_node_name,get_network_bcast
 
 TIMEOUT = 6 # Run for 30 seconds max.
 PING_INTERVAL    = 2  # Once every 5 seconds
@@ -23,6 +23,9 @@ def foscam_poll(logger=None,verbose=False):
 
     clients = []
     clients_by_addr = {}
+
+    #myip = get_network_ip(logger=logger)
+    mybcast = get_network_bcast(logger=logger)
 
     # Create UDP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -41,9 +44,9 @@ def foscam_poll(logger=None,verbose=False):
 
         # Broadcast our beacon
         if logger is not None:
-            logger.info("Pinging for Foscam's")
-        sock.sendto(SEARCH_REQUEST, 0, ("255.255.255.255", PING_PORT_NUMBER))
-            
+            logger.info("Pinging for Foscams {}:{}".format(mybcast,PING_PORT_NUMBER))
+        sock.sendto(SEARCH_REQUEST, 0, (mybcast, PING_PORT_NUMBER))
+
         ping_timeout = time.time() + PING_INTERVAL
 
         while time.time() < ping_timeout:
@@ -70,7 +73,7 @@ def foscam_poll(logger=None,verbose=False):
             logger.debug("Response from: %s" % (addr))
             if verbose:
                 logger.debug("msg=%s" % msg)
-            
+
         if msg == SEARCH_REQUEST:
             if logger is not None:
                 logger.debug("ignore my echo")
@@ -104,12 +107,12 @@ def foscam_poll(logger=None,verbose=False):
                 'name':      get_valid_node_name(name.rstrip('\x00')),
                 'ip':        socket.inet_ntoa(pack('!I',ip_i)),
                 'port':      port,
-                'mask':      socket.inet_ntoa(pack('!I',mask_i)), 
-                'gateway':   socket.inet_ntoa(pack('!I',gateway_i)), 
-                'dns':       socket.inet_ntoa(pack('!I',dns_i)), 
+                'mask':      socket.inet_ntoa(pack('!I',mask_i)),
+                'gateway':   socket.inet_ntoa(pack('!I',gateway_i)),
+                'dns':       socket.inet_ntoa(pack('!I',dns_i)),
                 'reserve':   "%d.%d.%d.%d" % (r1, r2, r3, r4),
                 'sys':       "%d.%d.%d.%d" % (s1, s2, s3, s4),
-                'app':       "%d.%d.%d.%d" % (a1, a2, a3, a4), 
+                'app':       "%d.%d.%d.%d" % (a1, a2, a3, a4),
                 'dhcp':      dhcp,
                 'reserve_a': (r1, r2, r3, r4),
                 'sys_a':     (s1, s2, s3, s4),
@@ -142,5 +145,3 @@ if __name__ == '__main__':
     if (len(sys.argv) > 1 and sys.argv[1] == "-v"):
         verbose = True
     foscam_poll(logger,verbose)
-
-    

@@ -116,6 +116,9 @@ Each Camera is added with a Motion node, you can right-click the camera and sele
 
 # Release Notes
 
+- 2.2.0: 2019/10/31
+  - Fix to get proper broadcast address to work on polisy, thanks @xking
+  - Also, fix to not require pinging 8.8.8.8 anymore, thanks again @xking
 - 2.1.16: 2019/10/30
   - Fix crash when can't figure our local ip address because 8.8.8.8 is not available
     - This means the RESTServer will not be running, so Motion push from old foscam's will not work

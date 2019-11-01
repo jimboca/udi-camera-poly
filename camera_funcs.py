@@ -1,5 +1,5 @@
 
-import os,socket,struct,json,re
+import os,socket,struct,json,re,netifaces
 
 def myint(value):
     """ round and convert to int """
@@ -10,13 +10,51 @@ def myfloat(value, prec=4):
     return round(float(value), prec)
 
 # from http://commandline.org.uk/python/how-to-find-out-ip-address-in-python/
-def old_get_network_ip(rhost):
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect((rhost, 0))
-    ip = s.getsockname()[0]
-    s.close()
-    return ip
+def get_network_ip_old(remote_server="8.8.8.8",logger=None):
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect((remote_server, 80))
+            rt = s.getsockname()[0]
+    except Exception as err:
+        logger.error('get_network_ip: failed: {0}'.format(err))
+        rt = False
+    logger.info('get_network_ip: Returning {0}'.format(rt))
+    return rt
 
+def get_network_interface(interface='default',logger=None):
+    # Get the default gateway
+    gws = netifaces.gateways()
+    rt = False
+    if interface in gws:
+        gwd = gws[interface][netifaces.AF_INET]
+        logger.debug("gwd: {}={}".format(interface,gwd))
+        ifad = netifaces.ifaddresses(gwd[1])
+        rt = ifad[netifaces.AF_INET]
+        logger.debug("ifad: {}={}".format(gwd[1],rt))
+    else:
+        logger.error("No {} in gateways:{}".format(interface,gateways))
+    return rt
+
+
+def get_network_ip(logger=None):
+    try:
+        iface = get_network_interface(logger=logger)
+        rt = iface[0]['addr']
+    except Exception as err:
+        logger.error('get_network_ip: failed: {0}'.format(err))
+        rt = False
+    logger.info('get_network_ip: Returning {0}'.format(rt))
+    return rt
+
+def get_network_bcast(logger=None):
+    try:
+        iface = get_network_interface(logger=logger)
+        rt = iface[0]['broadcast']
+    except Exception as err:
+        logger.error('get_network_bcast: failed: {0}'.format(err))
+        rt = False
+    logger.info('get_network_bcast: Returning {0}'.format(rt))
+    return rt
 
 def ip2long(ip):
     """ Convert an IP string to long """
