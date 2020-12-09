@@ -274,8 +274,12 @@ class CameraController(polyinterface.Controller):
                     addit = False
                 if addit:
                     if cfgd['type'] == "Amcrest":
-                        self.addNode(Amcrest(self, self.user, self.password, config=cfgd))
-                    self.incr_num_cams()
+                        try:
+                            self.addNode(Amcrest(self, self.user, self.password, config=cfgd))
+                        except:
+                            self.l_error('add config cams',"failed adding {}, {}".format(param,sys.exc_info()[1]))
+                        else:
+                            self.incr_num_cams()
 
     def discover_foscam(self):
         self.l_info("discover_foscam","Polling for Foscam cameras %s" % (self.foscam_polling))
